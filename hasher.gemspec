@@ -8,16 +8,11 @@ Gem::Specification.new do |spec|
   spec.description = 'This gem provides ...'
   spec.authors     = ['Alexander Brjakin']
   spec.email       = 'digitoider@gmail.com'
-  spec.files       = %w(
-    lib/hasher
-  )
+  spec.files       = ['lib/hasher']
   spec.require_paths = ['lib']
   spec.homepage    = 'http://rubygems.org/gems/hasher'
   spec.license     = 'MIT'
 
   spec.add_development_dependency 'rspec'
+  spec.add_development_dependency 'rubocop'
 end
-
-# def add_development_dependencies(spec)
-#   spec.add_development_dependency 'rspec'
-# end
