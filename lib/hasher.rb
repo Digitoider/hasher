@@ -3,10 +3,13 @@
 require 'hasher/kernel/resolver'
 require 'hasher/kernel/tree'
 
+require 'pry-byebug'
+
 class Hasher
 
   def method_missing(method_name, *args)
-    resolver.resolve(method_name, args)
+    result = resolver.resolve(method_name, args)
+    return result if retrieval?(method_name)
     self
   end
 
@@ -15,6 +18,10 @@ class Hasher
   # and so on
 
   protected
+
+  def retrieval?(method_name)
+    method_name.to_s.chars.last == '!'
+  end
 
   def resolver
     @resolver ||= ::Kernel::Resolver.new

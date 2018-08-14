@@ -13,7 +13,7 @@ module Kernel
 
     def initialize(type: TYPES::TREE::TYPE_LEAF, root: nil, key: nil)
       @nodes = []
-      @type = type
+      @type = root.nil? ? TYPES::TREE::TYPE_COMPOSITE : type
       @root = root.nil? ? self : root
       @key  = key
       @chain = []
@@ -22,7 +22,9 @@ module Kernel
     def resolve_assigning(value)
       current_node = @root
       @chain.each do |link|
-        current_node = current_node.get_node!(link)
+        node = current_node.get_node!(link)
+        current_node.nodes << node unless current_node.nodes.include?(node)
+        current_node = node
       end
 
       assign_value!(current_node, value)
@@ -42,9 +44,11 @@ module Kernel
     protected
 
     def find_value(current_node, key)
+      # binding.pry
       return current_node.nodes[0] if current_node.type == TYPES::TREE::TYPE_LEAF
 
-      node = current_node.nodes.find { |node| node.key == key }
+      current_key = @root.chain.shift
+      node = current_node.nodes.find { |node| node.key == current_key }
       return nil if node.nil?
       find_value(node, key)
     end
@@ -60,7 +64,7 @@ module Kernel
 
     def get_node!(link)
       node = @nodes.find { |node| node.key == link }
-      node = Tree.new(type: TYPES::TREE::TYPE_COMPOSITE, root: @root) if node.nil?
+      node = Tree.new(type: TYPES::TREE::TYPE_COMPOSITE, root: @root, key: link) if node.nil?
       node
     end
 
