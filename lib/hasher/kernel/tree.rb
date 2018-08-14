@@ -9,18 +9,17 @@ module Kernel
   end
 
   class Tree
-    attr_accessor :nodes, :type, :root, :chain
+    attr_accessor :nodes, :type, :root, :chain, :key
 
-    def initialize(type: TYPES::TREE::TYPE_LEAF, root: nil)
+    def initialize(type: TYPES::TREE::TYPE_LEAF, root: nil, key: nil)
       @nodes = []
       @type = type
       @root = root.nil? ? self : root
+      @key  = key
       @chain = []
     end
 
-    def resolve_assigning(key, value)
-      @chain << key
-
+    def resolve_assigning(value)
       current_node = @root
       @chain.each do |link|
         current_node = current_node.get_node!(link)
@@ -30,7 +29,25 @@ module Kernel
       reset_chain!
     end
 
+    def resolve_retrieval(key)
+      value = find_value(@root, key)
+      reset_chain!
+      value
+    end
+
+    def add_chain_link(key)
+      chain << key
+    end
+
     protected
+
+    def find_value(current_node, key)
+      return current_node.nodes[0] if current_node.type == TYPES::TREE::TYPE_LEAF
+
+      node = current_node.nodes.find { |node| node.key == key }
+      return nil if node.nil?
+      find_value(node, key)
+    end
 
     def assign_value!(node, value)
       node.type = TYPES::TREE::TYPE_LEAF

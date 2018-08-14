@@ -9,23 +9,23 @@ module Kernel
     def resolve(key, args)
       operation = key.to_s.chars.last
       value = args.first
-      return resolve_assigning(key, value) if operation == '='
-      return resolve_retrieval(key, value) if operation == '!'
-      resolve_chain_link(key, value)
+      add_chain_link(key)
+      return resolve_assigning(value) if operation == '='
+      resolve_retrieval(key)          if operation == '!'
     end
 
     protected
 
-    def resolve_assigning(key, value)
-      tree.assign_chain_link(key, value)
+    def resolve_assigning(value)
+      tree.assign_chain_link(value)
     end
 
-    def resolve_retrieval(key, value)
-      tree.resolve_retrieval(key, value)
+    def resolve_retrieval(key)
+      tree.resolve_retrieval(key)
     end
 
-    def resolve_chain_link(key, value)
-      tree.add_chain_link(key, value)
+    def add_chain_link(key)
+      tree.add_chain_link(key)
     end
 
     def tree

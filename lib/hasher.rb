@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'hasher/kernel/resolver'
+require 'hasher/kernel/tree'
+
 class Hasher
 
   def method_missing(method_name, *args)
