@@ -21,12 +21,12 @@ module Kernel
     def resolve_assigning(key, value)
       @chain << key
 
-      current_root_node = @root
+      current_node = @root
       @chain.each do |link|
-        current_root_node = current_root_node.get_node!(link)
+        current_node = current_node.get_node!(link)
       end
 
-      assign_value!(current_root_node, value)
+      assign_value!(current_node, value)
       reset_chain!
     end
 

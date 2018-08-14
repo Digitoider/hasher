@@ -7,7 +7,7 @@ module Kernel
     end
 
     def resolve(key, args)
-      operation = key.chars.last
+      operation = key.to_s.chars.last
       value = args.first
       return resolve_assigning(key, value) if operation == '='
       return resolve_retrieval(key, value) if operation == '!'
