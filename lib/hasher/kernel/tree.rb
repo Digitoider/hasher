@@ -21,8 +21,10 @@ module Kernel
 
     def resolve_assigning(value)
       current_node = @root
-      @chain.each do |link|
+      @chain.each_with_index do |link, index|
         node = current_node.get_node!(link)
+        # if node is a leaf, but there are more elements in @chain, then we have to make it of a TYPE_COMPOSITE
+        resolve_node_type!(node, index)
         current_node.nodes << node unless current_node.nodes.include?(node)
         current_node = node
       end
@@ -42,6 +44,14 @@ module Kernel
     end
 
     protected
+
+    def resolve_node_type!(node, index)
+      if index < @chain.count - 1
+        node.type = TYPES::TREE::TYPE_COMPOSITE
+        node.nodes = []
+      end
+    end
+
 
     def find_value(current_node, key)
       # binding.pry
