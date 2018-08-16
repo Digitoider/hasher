@@ -18,6 +18,7 @@ module Kernel
         node = current_node.get_node!(link)
         # if node is a leaf, but there are more elements in @chain, then we have to make it of a TYPE_COMPOSITE
         resolve_node_type!(node, index)
+        binding.pry
         current_node.nodes << node unless current_node.nodes.include?(node)
         current_node = node
       end
