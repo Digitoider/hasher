@@ -17,6 +17,7 @@ module Kernel
       @chain.each_with_index do |link, index|
         node = current_node.get_node!(link)
         # if node is a leaf, but there are more elements in @chain, then we have to make it of a TYPE_COMPOSITE
+        # TODO: h.lets.rock = 1; h.lets = 2; h.lets! # => returns <Kernel ...> instead of value
         resolve_node_type!(node, index)
         current_node.nodes << node unless current_node.nodes.include?(node)
         current_node = node
@@ -48,17 +49,27 @@ module Kernel
 
     def find_value(current_node, key)
       # binding.pry
-      return current_node.nodes[0] if current_node.type == TYPES::TREE::TYPE_LEAF
-
+      return current_node.nodes[0] if current_node.leaf? && @root.chain.count.zero?
+      return nil if current_node.leaf? && @root.chain.count.positive?
       current_key = @root.chain.shift
+      return nil if current_key.nil?
       node = current_node.nodes.find { |node| node.key == current_key }
       return nil if node.nil?
       find_value(node, key)
     end
 
+    def leaf?
+      @type == TYPES::TREE::TYPE_LEAF
+    end
+
+    def composite?
+      @type == TYPES::TREE::TYPE_COMPOSITE
+    end
+
     def assign_value!(node, value)
+      # binding.pry
       node.type = TYPES::TREE::TYPE_LEAF
-      node.nodes << value
+      node.nodes = [value]
     end
 
     def reset_chain!

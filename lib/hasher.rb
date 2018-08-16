@@ -10,8 +10,9 @@ require 'pry-byebug'
 class Hasher
 
   def method_missing(method_name, *args)
+    # binding.pry
     result = resolver.resolve(method_name, args)
-    return result if retrieval?(method_name)
+    return result if permitted_to_return_result?(method_name, result)
     self
   end
 
@@ -20,6 +21,16 @@ class Hasher
   # and so on
 
   protected
+
+  def permitted_to_return_result?(method_name, value)
+    retrieval?(method_name) && value_type_is_allowed?(value)
+  end
+
+  def value_type_is_allowed?(value)
+    # binding.pry
+    allowed_types = [String, Numeric, Integer, Array, Symbol, TrueClass, FalseClass, NilClass]
+    allowed_types.include?(value.class)
+  end
 
   def retrieval?(method_name)
     method_name.to_s.chars.last == ::Kernel::Operations::VALUE_EXTRACTING
