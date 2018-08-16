@@ -12,8 +12,8 @@ module Kernel
       value = args.first
       # binding.pry
       add_chain_link(extracted_key)
-      return resolve_assigning(value) if operation == '='
-      resolve_retrieval(extracted_key)          if operation == '!'
+      return resolve_assigning(value)  if operation == Operations::VALUE_ASSIGNING
+      resolve_retrieval(extracted_key) if operation == Operations::VALUE_EXTRACTING
     end
 
     protected
@@ -31,8 +31,8 @@ module Kernel
     end
 
     def extract_key(key)
-      extracted_key = key.to_s.split('=').first
-      extracted_key = extracted_key.split('!').first
+      extracted_key = key.to_s.split(Operations::VALUE_ASSIGNING).first
+      extracted_key = extracted_key.split(Operations::VALUE_EXTRACTING).first
       extracted_key.to_sym
     end
 

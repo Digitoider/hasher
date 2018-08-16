@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require 'hasher/kernel/resolver'
+require 'hasher/kernel/types/tree'
+require 'hasher/kernel/operations'
 require 'hasher/kernel/tree'
 
 require 'pry-byebug'
@@ -20,7 +22,7 @@ class Hasher
   protected
 
   def retrieval?(method_name)
-    method_name.to_s.chars.last == '!'
+    method_name.to_s.chars.last == ::Kernel::Operations::VALUE_EXTRACTING
   end
 
   def resolver
