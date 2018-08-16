@@ -17,7 +17,6 @@ module Kernel
       @chain.each_with_index do |link, index|
         node = current_node.get_node!(link)
         # if node is a leaf, but there are more elements in @chain, then we have to make it of a TYPE_COMPOSITE
-        # TODO: h.lets.rock = 1; h.lets = 2; h.lets! # => returns <Kernel ...> instead of value
         resolve_node_type!(node, index)
         current_node.nodes << node unless current_node.nodes.include?(node)
         current_node = node
@@ -90,15 +89,6 @@ module Kernel
 
     def create_node(link)
       @nodes << node.new(link) # @nodes << node.new(link, Tree.new)   ?????
-    end
-  end
-
-  class Node
-    attr_accessor :key, :value
-
-    def initialize(key, value = nil)
-      @key = key
-      @value = value
     end
   end
 end
