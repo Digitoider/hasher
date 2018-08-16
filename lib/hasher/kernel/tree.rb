@@ -36,6 +36,14 @@ module Kernel
       chain << key
     end
 
+    def leaf?
+      @type == TYPES::TREE::TYPE_LEAF
+    end
+
+    def composite?
+      @type == TYPES::TREE::TYPE_COMPOSITE
+    end
+
     protected
 
     def resolve_node_type!(node, index)
@@ -55,14 +63,6 @@ module Kernel
       node = current_node.nodes.find { |node| node.key == current_key }
       return nil if node.nil?
       find_value(node, key)
-    end
-
-    def leaf?
-      @type == TYPES::TREE::TYPE_LEAF
-    end
-
-    def composite?
-      @type == TYPES::TREE::TYPE_COMPOSITE
     end
 
     def assign_value!(node, value)
