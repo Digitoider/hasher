@@ -14,13 +14,20 @@ module Kernel
         pretty_print_recursive(node, format_base_output(base_output, nodes_amount, index))
       end
     end
+%{
+
+h = Hasher.new
+h.a.b.c.d.e = 5
+h.lat.lng.mandatory = 'coooool'
+h.figure.it.out = {a: 1}
+h.__pretty_print
+
+}
 
     def format_base_output(base_output, nodes_amount, current_node_index)
-      if current_node_index == nodes_amount - 1 && nodes_amount != 1
-        "#{base_output}#{pattern_branch_empty_last}"
-      else
-        "#{base_output}#{pattern_branch_empty_not_last}"
-      end
+      return "#{base_output}   " if nodes_amount == 1 || current_node_index == nodes_amount - 1
+      return "#{base_output}#{pattern_branch_empty_last}" if current_node_index == nodes_amount - 1
+      "#{base_output}#{pattern_branch_empty_not_last}"
     end
 
     def print_composite(base_output, key)
@@ -32,7 +39,7 @@ module Kernel
     end
 
     def pattern_key(key)
-      " #{key}"
+      "#{key}"
     end
 
     def pattern_value(value)
@@ -52,7 +59,7 @@ module Kernel
     end
 
     def pattern_branch_ramificating
-      '|--'
+      '+--'
     end
 
     def pattern_composite_node(key)
