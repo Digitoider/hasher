@@ -41,5 +41,15 @@ RSpec.describe Hasher do
         expect(h.lets).to be_an_instance_of(subject)
       end
     end
+
+    context 'when link has many nodes' do
+      it 'returns values according to requested node' do
+        h = subject.new
+        h.lets.rock = 5
+        h.lets.chill = 10
+        expect(h.lets.rock!).to eq(5)
+        expect(h.lets.chill!).to eq(10)
+      end
+    end
   end
 end
