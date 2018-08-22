@@ -4,10 +4,21 @@ require 'hasher/kernel/resolver'
 require 'hasher/kernel/types/tree'
 require 'hasher/kernel/operations'
 require 'hasher/kernel/tree'
+require 'hasher/kernel/pretty_printer'
 
 require 'pry-byebug'
 
 class Hasher
+
+  # debug_method. TODO: remove after debugging
+  def __tree
+    resolver.instance_variable_get(:@tree)
+  end
+
+  # debug_method. TODO: remove after debugging
+  def __pretty_print
+    ::Kernel::PrettyPrinter.new.pretty_print(__tree)
+  end
 
   def method_missing(method_name, *args)
     # binding.pry
