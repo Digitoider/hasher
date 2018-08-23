@@ -12,9 +12,26 @@ module Kernel
       @chain = []
     end
 
+%{
+
+h = Hasher.new
+h.a.b.c = 5
+h.a.r.t = 7
+h.lat.lng.mandatory = 'coooool'
+h.figure.it.out = {a: 1}
+h.__pretty_print
+
+h = Hasher.new
+h.a.b = 5
+h.a.c = 7
+h.__pretty_print
+
+}
+
     def resolve_assigning(value)
       current_node = @root
       @chain.each_with_index do |link, index|
+        # binding.pry
         node = current_node.get_node!(link)
         # if node is a leaf, but there are more elements in @chain, then we have to make it of a TYPE_COMPOSITE
         resolve_node_type!(node, index)
@@ -49,8 +66,8 @@ module Kernel
 
     def resolve_node_type!(node, index)
       if index < @chain.count - 1
+        node.nodes = [] if node.leaf?
         node.type = TYPES::TREE::TYPE_COMPOSITE
-        node.nodes = []
       end
     end
 
