@@ -2,27 +2,39 @@
 
 module Kernel
   # TODO: Configuration:
-  #
+  # key_value_separator: String
+  # symbols_per_node: Number
 
-  class PrettyPrinter
+  module Tree
+    class NotImplementedError < StandardError
+    end
+
+    class Base
+      attr_accessor :key, :value, :nodes
+
+      def leaf?
+        raise NotImplementedError, 'Method `.leaf?` must be implemented.'
+      end
+
+      def composite?
+        raise NotImplementedError, 'Method `.composite?` must be implemented.'
+      end
+    end
+  end
+
+  class TreePrinter
     attr_reader :result
 
     def initialize
       @result = []
     end
 
-    def pretty_print(tree)
+    def print(tree)
       envelope do
         reset_result!
         build_result!(tree)
         result.each { |str| puts str }
       end
-    end
-
-    def envelope(&block)
-      5.times { puts }
-      yield(block)
-      5.times { puts }
     end
 
     def build_result!(tree)
@@ -34,6 +46,8 @@ module Kernel
     def reset_result!
       @result = []
     end
+
+    protected
 
     def build_result_recursive!(current_node, base_output = '')
       nodes_amount = current_node.nodes.count
@@ -47,7 +61,7 @@ module Kernel
     def format_base_output(base_output, nodes_amount, current_node_index)
       return "#{base_output}   " if nodes_amount == 1 || current_node_index == nodes_amount - 1
       return "#{base_output}#{pattern_branch_empty_last}" if current_node_index == nodes_amount - 1
-      "#{base_output}#{pattern_branch_empty_not_last}"
+      "#{base_output}#{pattern_branch_empty_intermediate}"
     end
 
     def last?(nodes_amount, current_node_index)
@@ -56,7 +70,7 @@ module Kernel
 
     def get_composite(base_output, key, nodes_amount, current_node_index)
       return "#{base_output}#{pattern_branch_ramificating_last}#{pattern_key(key)}" if last?(nodes_amount, current_node_index)
-      "#{base_output}#{pattern_branch_ramificating}#{pattern_key(key)}"
+      "#{base_output}#{pattern_branch_ramificating_intermediate}#{pattern_key(key)}"
     end
 
     def get_leaf(base_output, key, value)
@@ -79,20 +93,16 @@ module Kernel
       '+--'
     end
 
-    def pattern_branch_empty_not_last
+    def pattern_branch_empty_intermediate
       '|  '
     end
 
-    def pattern_branch_ramificating
+    def pattern_branch_ramificating_intermediate
       '|--'
     end
 
     def pattern_branch_ramificating_last
       '`--'
-    end
-
-    def pattern_composite_node(key)
-      put key
     end
   end
 end

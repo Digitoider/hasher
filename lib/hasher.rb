@@ -17,7 +17,7 @@ class Hasher
 
   # debug_method. TODO: remove after debugging
   def __pretty_print
-    ::Kernel::PrettyPrinter.new.pretty_print(__tree)
+    ::Kernel::TreePrinter.new.print(__tree)
   end
 
   def method_missing(method_name, *args)
