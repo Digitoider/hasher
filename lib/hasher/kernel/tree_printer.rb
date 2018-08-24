@@ -14,11 +14,11 @@ module Kernel
 
     def print(tree)
       reset_result!
-      build_result!(tree)
+      build_result(tree)
       result.each { |str| puts str }
     end
 
-    def build_result!(tree)
+    def build_result(tree)
       @result << tree.key
       build_result_recursive!(tree)
       @result
@@ -33,7 +33,7 @@ module Kernel
     def build_result_recursive!(current_node, base_output = '')
       nodes_amount = current_node.nodes.count
       current_node.nodes.each_with_index do |node, index|
-        next @result << get_leaf(base_output, node.key, node.nodes[0]) if node.leaf?
+        next @result << get_leaf(base_output, node.key, node.value, nodes_amount, index) if node.leaf?
         @result << get_composite(base_output, node.key, nodes_amount, index) if node.composite?
         build_result_recursive!(node, format_base_output(base_output, nodes_amount, index))
       end
@@ -54,8 +54,9 @@ module Kernel
       "#{base_output}#{pattern_branch_ramificating_intermediate}#{pattern_key(key)}"
     end
 
-    def get_leaf(base_output, key, value)
-      "#{base_output}#{pattern_branch_ramificating_last}#{pattern_key(key)}#{pattern_value(value)}"
+    def get_leaf(base_output, key, value, nodes_amount, current_node_index)
+      return "#{base_output}#{pattern_branch_ramificating_last}#{pattern_key(key)}#{pattern_value(value)}" if last?(nodes_amount, current_node_index)
+      "#{base_output}#{pattern_branch_ramificating_intermediate}#{pattern_key(key)}#{pattern_value(value)}"
     end
 
     def pattern_key(key)

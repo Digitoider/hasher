@@ -62,6 +62,10 @@ h.__pretty_print
       @type == TYPES::TREE::TYPE_COMPOSITE
     end
 
+    def value
+      nodes[0] if leaf?
+    end
+
     protected
 
     def resolve_node_type!(node, index)
