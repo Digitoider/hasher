@@ -5,23 +5,6 @@ module Kernel
   # key_value_separator: String
   # symbols_per_node: Number
 
-  module Tree
-    class NotImplementedError < StandardError
-    end
-
-    class Base
-      attr_accessor :key, :value, :nodes
-
-      def leaf?
-        raise NotImplementedError, 'Method `.leaf?` must be implemented.'
-      end
-
-      def composite?
-        raise NotImplementedError, 'Method `.composite?` must be implemented.'
-      end
-    end
-  end
-
   class TreePrinter
     attr_reader :result
 
@@ -30,11 +13,9 @@ module Kernel
     end
 
     def print(tree)
-      envelope do
-        reset_result!
-        build_result!(tree)
-        result.each { |str| puts str }
-      end
+      reset_result!
+      build_result!(tree)
+      result.each { |str| puts str }
     end
 
     def build_result!(tree)

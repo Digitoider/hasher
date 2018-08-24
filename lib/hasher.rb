@@ -4,7 +4,7 @@ require 'hasher/kernel/resolver'
 require 'hasher/kernel/types/tree'
 require 'hasher/kernel/operations'
 require 'hasher/kernel/tree'
-require 'hasher/kernel/pretty_printer'
+require 'hasher/kernel/tree_printer'
 
 require 'pry-byebug'
 
