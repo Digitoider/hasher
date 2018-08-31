@@ -5,6 +5,7 @@ require 'hasher/kernel/types/tree'
 require 'hasher/kernel/operations'
 require 'hasher/kernel/tree'
 require 'hasher/kernel/tree_printer'
+require 'hasher/kernel/serializers/hasherizer'
 
 require 'pry-byebug'
 

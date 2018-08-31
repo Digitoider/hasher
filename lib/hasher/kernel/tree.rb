@@ -2,6 +2,8 @@
 
 module Kernel
   class Tree
+    # TODO: configuration class
+    # translate_hash_into_hasher_automatically: Boolean
     attr_accessor :nodes, :type, :root, :chain, :key
 
     def initialize(type: TYPES::TREE::TYPE_LEAF, root: nil, key: nil)

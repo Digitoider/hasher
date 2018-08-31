@@ -4,6 +4,8 @@ module Kernel
   # TODO: Configuration:
   # key_value_separator: String
   # symbols_per_node: Number
+  # print_leaf_with_key: Boolean
+  # leaf_ramification_pattern: String, 'default: `--'
 
   class TreePrinter
     attr_reader :result
