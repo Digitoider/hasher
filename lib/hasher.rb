@@ -9,7 +9,31 @@ require 'hasher/kernel/tree_printer'
 require 'pry-byebug'
 
 class Hasher
+  def __not_working_cases
+    h.a = [1, { b: { c: 2 } }]
+    # => [1, {:b=>{:c=>2}}]
+    h.a[1].b.c
+    # => 2
+    h.a[1].b.d
+    # => 2
+    h.a[1].b.asdf
+    # => 2
 
+    # -------
+
+    h.a = [1, {b: {c: 2, d: {e: 4}}}]
+    # => [1, {:b=>{:c=>2, :d=>{:e=>4}}}]
+    h.a[1].b.d.e
+    # => 4
+    h.a[1].b.d.ds
+    # => 4
+  end
+
+  def initialize(something = {})
+    if something.is_a?(::Kernel::Tree)
+      @tree = something
+    end
+  end
   # debug_method. TODO: remove after debugging
   def __tree
     resolver.instance_variable_get(:@tree)
@@ -21,10 +45,9 @@ class Hasher
   end
 
   def method_missing(method_name, *args)
-    # binding.pry
-    result = resolver.resolve(method_name, args)
-    return result if permitted_to_return_result?(method_name, result)
-    self
+    action = resolver.resolve(method_name, args, tree)
+    return self if action.assigned?
+    action.value
   end
 
   # TODO: redirect all standard methods to method_missing
@@ -33,18 +56,8 @@ class Hasher
 
   protected
 
-  def permitted_to_return_result?(method_name, value)
-    retrieval?(method_name) && value_type_is_allowed?(value)
-  end
-
-  def value_type_is_allowed?(value)
-    # binding.pry
-    allowed_types = [String, Numeric, Integer, Array, Symbol, TrueClass, FalseClass, NilClass]
-    allowed_types.include?(value.class)
-  end
-
-  def retrieval?(method_name)
-    method_name.to_s.chars.last == ::Kernel::Operations::VALUE_EXTRACTING
+  def tree
+    @tree ||= ::Kernel::Tree.new
   end
 
   def resolver

@@ -2,37 +2,37 @@
 
 module Kernel
   class Resolver
-    def initialize
+    def resolve(key, args, tree)
+      return resolve_retrieval(key, tree) if retrieval?(key)
 
-    end
-
-    def resolve(key, args)
-      operation = key.to_s.chars.last
       extracted_key = extract_key(key)
       value = args.first
-      # binding.pry
-      add_chain_link(extracted_key)
-      return resolve_assigning(value)  if operation == Operations::VALUE_ASSIGNING
-      resolve_retrieval(extracted_key) if operation == Operations::VALUE_EXTRACTING
+      resolve_assigning(extracted_key, value, tree)
     end
 
     protected
 
-    def resolve_assigning(value)
-      tree.resolve_assigning(value)
+    def assigning?(key)
+      key.to_s.chars.last == ::Kernel::Operations::VALUE_ASSIGNING
     end
 
-    def resolve_retrieval(key)
-      tree.resolve_retrieval(key)
+    def retrieval?(key)
+      !assigning?(key)
     end
 
-    def add_chain_link(key)
-      tree.add_chain_link(extract_key(key))
+    def resolve_assigning(extracted_key, value, tree)
+      tree.assign(extracted_key, value)
+      ::Kernel::Action.new(assigned: true)
+    end
+
+    def resolve_retrieval(key, tree)
+      # binding.pry
+      value = tree.retrieve(key)
+      ::Kernel::Action.new(retrieved: true, value: value)
     end
 
     def extract_key(key)
       extracted_key = key.to_s.split(Operations::VALUE_ASSIGNING).first
-      extracted_key = extracted_key.split(Operations::VALUE_EXTRACTING).first
       extracted_key.to_sym
     end
 
