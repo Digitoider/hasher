@@ -37,7 +37,7 @@ class Hasher
     ::Kernel::TreePrinter.new.print(__tree)
   end
 
-  def __to_h
+  def to_h
     ::Kernel::Hasherizer.new.to_h(tree.root)
   end
 
