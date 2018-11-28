@@ -13,6 +13,7 @@ require 'hasher/kernel/resolvers/main_resolver'
 require 'hasher/kernel/types/tree'
 require 'hasher/kernel/operations'
 require 'hasher/kernel/action_resolver'
+require 'hasher/kernel/hasherizer'
 require 'hasher/kernel/response'
 require 'hasher/kernel/tree'
 require 'hasher/kernel/tree_printer'
@@ -33,6 +34,10 @@ class Hasher
   # debug_method. TODO: remove after debugging
   def __pretty_print
     ::Kernel::TreePrinter.new.print(__tree)
+  end
+
+  def __to_h
+    ::Kernel::Hasherizer.new.to_h(tree.root)
   end
 
   def method_missing(method_name, *args)
