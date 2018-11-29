@@ -112,4 +112,44 @@ RSpec.describe Hasher do
       end
     end
   end
+
+  describe '#to_h' do
+    context 'deep' do
+      it 'mixed' do
+        h = subject.new
+        h.a = [
+          1,
+          {
+            b: 2,
+            c: {
+              d: [13, Numeric],
+              e: nil
+            }
+          }
+        ]
+        h.hold = {}
+        h.it = Hasher.new
+        h.it.man = false
+
+        expected_result = {
+          a: [
+            1,
+            {
+              b: 2,
+              c: {
+                d: [13, Numeric],
+                e: nil
+              }
+            }
+          ],
+          hold: {},
+          it: {
+            man: false
+          }
+        }
+
+        expect(h.to_h).to eq(expected_result)
+      end
+    end
+  end
 end
