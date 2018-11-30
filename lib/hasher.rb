@@ -7,7 +7,11 @@ require 'hasher/kernel/hasherizers/dumpers/basic_type_handler'
 require 'hasher/kernel/hasherizers/dumpers/default_handler'
 require 'hasher/kernel/hasherizers/dumpers/composite_node_handler'
 require 'hasher/kernel/hasherizers/dumpers/hasher_handler'
-require 'hasher/kernel/hasherizers/dumpers/key_value_pair_nil_handler.rb'
+require 'hasher/kernel/hasherizers/dumpers/key_value_pair_nil_handler'
+require 'hasher/kernel/hasherizers/loaders/main_loader'
+require 'hasher/kernel/hasherizers/loaders/default_loader'
+require 'hasher/kernel/hasherizers/loaders/array_loader'
+require 'hasher/kernel/hasherizers/loaders/hash_loader'
 require 'hasher/kernel/nodes/base'
 require 'hasher/kernel/nodes/leaf'
 require 'hasher/kernel/nodes/composite'
@@ -33,15 +37,6 @@ class Hasher
     if something.is_a?(::Kernel::Tree)
       @tree = something
     end
-  end
-  # debug_method. TODO: remove after debugging
-  def __tree
-    action_resolver.instance_variable_get(:@tree)
-  end
-
-  # debug_method. TODO: remove after debugging
-  def __pretty_print
-    ::Kernel::TreePrinter.new.print(__tree)
   end
 
   def to_h

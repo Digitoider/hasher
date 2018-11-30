@@ -11,15 +11,10 @@ module Kernel
     def assign(extracted_key, value)
       node = main_resolver.resolve(key: extracted_key, value: value)
 
-      if @root.composite?
-        return @root << node
-      end
+      return @root << node if @root.composite?
+      return @root = node if @root.key.nil? || @root.key == extracted_key
 
-      if @root.key.nil? || @root.key == extracted_key
-        return @root = node
-      end
-
-      composite_node = ::Kernel::Nodes::Composite.new(key: '__abra')
+      composite_node = ::Kernel::Nodes::Composite.new#(key: '__abra')
       composite_node << @root
       composite_node << node
       @root = composite_node
