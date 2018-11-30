@@ -110,6 +110,13 @@ RSpec.describe Hasher do
   end
 
   describe '#to_h' do
+    context 'just created' do
+      it 'empty hash' do
+        h = subject.new
+        expect(h.to_h).to eq({})
+      end
+    end
+
     context 'deep' do
       it 'mixed' do
         h = subject.new
