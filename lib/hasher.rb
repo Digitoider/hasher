@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'hasher/kernel/errors/not_implemented_error'
+require 'hasher/kernel/dirty/indifferentiator'
 require 'hasher/kernel/hasherizers/dumpers/main_dumper'
 require 'hasher/kernel/hasherizers/dumpers/array_handler'
 require 'hasher/kernel/hasherizers/dumpers/basic_type_handler'
@@ -43,8 +44,17 @@ class Hasher
     ::Kernel::Hasherizer.new.to_h(tree.root)
   end
 
+  def []=(key, value)
+    action_resolver.resolve_assigning(key, value, tree)
+    self
+  end
+
+  def [](key)
+    action_resolver.resolve_retrieval(key, tree).value
+  end
+
   def method_missing(method_name, *args)
-    action = action_resolver.resolve(method_name, args, tree)
+    action = action_resolver.resolve(method_name, args.first, tree)
     return self if action.assigned?
     action.value
   end

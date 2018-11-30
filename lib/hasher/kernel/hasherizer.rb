@@ -7,7 +7,6 @@ module Kernel
     end
 
     def to_hasher(hash)
-      # TODO: deep symbolize hash
       ::Kernel::Hasherizers::Loaders::MainLoader.new.to_hasher(hash)
     end
   end
