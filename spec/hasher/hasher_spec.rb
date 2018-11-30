@@ -3,10 +3,6 @@
 RSpec.describe Hasher do
   subject { Hasher }
 
-  describe 'to_hash' do
-    it 'returns correct hash'
-  end
-
   describe '#method_missing' do
     context 'shallow' do
       it 'with simple values' do
@@ -130,6 +126,9 @@ RSpec.describe Hasher do
         h.hold = {}
         h.it = Hasher.new
         h.it.man = false
+        h.sym = :symbol
+        h.deep = {}
+        h.deep.empty_hash = {}
 
         expected_result = {
           a: [
@@ -145,6 +144,10 @@ RSpec.describe Hasher do
           hold: {},
           it: {
             man: false
+          },
+          sym: :symbol,
+          deep: {
+            empty_hash: {}
           }
         }
 
