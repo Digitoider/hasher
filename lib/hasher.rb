@@ -34,10 +34,15 @@ require 'hasher/kernel/serializers/hasherizer'
 require 'pry-byebug'
 
 class Hasher
-  def initialize(something = {})
-    if something.is_a?(::Kernel::Tree)
-      @tree = something
-    end
+  # def self.new(value = nil)
+  #   return ::Kernel::Hasherizer.new.to_hasher(value) if value.is_a?(Hash)
+  #   super
+  # end
+
+  def initialize(initial_value = {})
+    return if initial_value == {} || !initial_value.is_a?(Hash)
+    hasher = ::Kernel::Hasherizer.new.to_hasher(initial_value)
+    @tree = hasher.instance_variable_get(:@tree)
   end
 
   def to_h
@@ -46,7 +51,7 @@ class Hasher
 
   def []=(key, value)
     action_resolver.resolve_assigning(key, value, tree)
-    self
+    # self
   end
 
   def [](key)
