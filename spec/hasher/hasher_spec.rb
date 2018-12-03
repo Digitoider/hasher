@@ -107,6 +107,25 @@ RSpec.describe Hasher do
         expect(h.b.deep.mess).to eq(nil)
       end
     end
+
+    context 'array push' do
+      it 'using `<<`' do
+        h = subject.new
+        h.array = []
+        h.array << { item: 3 }
+        # h.array = h.array << { item: 3 }
+        # binding.pry
+        expect(h.array[0].item).to eq(3)
+      end
+
+      it 'using `push`' do
+        h = subject.new
+        h.coords = []
+        h.coords.push(lat: 45.36, lng: 63.54)
+        expect(h.array[0].lat).to eq(45.36)
+        expect(h.array[0].lng).to eq(63.54)
+      end
+    end
   end
 
   describe '#to_h' do
