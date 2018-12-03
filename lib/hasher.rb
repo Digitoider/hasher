@@ -3,6 +3,7 @@
 require 'hasher/kernel/errors/not_implemented_error'
 require 'hasher/kernel/dirty/indifferentiator'
 require 'hasher/kernel/hasherizers/dumpers/main_dumper'
+require 'hasher/kernel/hasherizers/dumpers/base_handler'
 require 'hasher/kernel/hasherizers/dumpers/array_handler'
 require 'hasher/kernel/hasherizers/dumpers/basic_type_handler'
 require 'hasher/kernel/hasherizers/dumpers/default_handler'

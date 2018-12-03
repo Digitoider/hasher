@@ -3,9 +3,10 @@
 module Kernel
   module Hasherizers
     module Dumpers
-      class DefaultHandler
+      class DefaultHandler < BaseHandler
         def to_h(node)
-          { node.key => node.value }
+          key = preprocess_key(node.key)
+          { key => node.value }
         end
 
         def can_hasherize?(_node)

@@ -3,7 +3,7 @@
 module Kernel
   module Hasherizers
     module Dumpers
-      class CompositeNodeHandler
+      class CompositeNodeHandler < BaseHandler
         def to_h(node)
           hash = {}
           node.children.each do |child_node|
@@ -13,7 +13,7 @@ module Kernel
         end
 
         def can_hasherize?(node)
-          node.is_a?(::Kernel::Nodes::Base) && node.composite?
+          node?(node) && node.composite?
         end
 
         private

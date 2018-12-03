@@ -3,10 +3,11 @@
 module Kernel
   module Hasherizers
     module Dumpers
-      class HasherHandler
+      class HasherHandler < BaseHandler
         def to_h(node)
           hash = hasher?(node) ? node.to_h : node.value.to_h
-          node.key.nil? ? hash : { node.key => hash }
+          key = preprocess_key(node.key)
+          node.key.nil? ? hash : { key => hash }
         end
 
         def can_hasherize?(node)

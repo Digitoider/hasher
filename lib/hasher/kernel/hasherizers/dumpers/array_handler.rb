@@ -3,13 +3,15 @@
 module Kernel
   module Hasherizers
     module Dumpers
-      class ArrayHandler
+      class ArrayHandler < BaseHandler
         def to_h(node)
           result = node.value.map do |n|
             main_hasherizer.to_h(n)
           end
 
-          { node.key => result }
+          key = preprocess_key(node.key)
+
+          { key => result }
         end
 
         def can_hasherize?(node)

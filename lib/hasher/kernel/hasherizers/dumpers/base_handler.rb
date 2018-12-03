@@ -3,7 +3,7 @@
 module Kernel
   module Hasherizers
     module Dumpers
-      class BaseHandler # NumericKeyHandler
+      class BaseHandler
         def to_h(_node)
           raise ::Kernel::Errors::NotImpementedError.new(:to_h)
         end
@@ -24,8 +24,14 @@ module Kernel
           node.is_a?(::Kernel::Nodes::Base)
         end
 
+        private
+
         def integer?(key)
           /^[-+]?\d+$/.match?(key.to_s)
+        end
+
+        def float?(key)
+          /^[-]?\d+\.\d+$/.match?(key.to_s)
         end
       end
     end
