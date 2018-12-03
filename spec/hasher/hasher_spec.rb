@@ -161,5 +161,156 @@ RSpec.describe Hasher do
         expect(h.to_h).to eq(expected_result)
       end
     end
+
+    context 'indifferent keys' do
+      it 'symbolic key' do
+        h = subject.new
+        h[:machine] = 'ry'
+        expect(h.to_h).to eq(machine: 'ry')
+      end
+
+      it 'string key' do
+        h = subject.new
+        h['mysterious'] = :sure_thing
+        expect(h.to_h).to eq(mysterious: :sure_thing)
+      end
+
+      it 'symbolic string' do
+        h = subject.new
+        h[:' That is taste for ya '] = Struct
+        expect(h.to_h).to eq(' That is taste for ya ' => Struct)
+      end
+
+      it 'via dot' do
+        h = subject.new
+        h.saint = 12
+        expect(h.to_h).to eq(saint: 12)
+      end
+
+      it 'mixed' do
+        h = subject.new
+        h.universe = 9
+        h['inside'] = 'of'
+        h[:all] = 3.6
+        h[:' of us '] = 'yeaaah'
+        expected_result = {
+          universe: 9,
+          inside: 'of',
+          all: 3.6,
+          ' of us ' => 'yeaaah'
+        }
+        expect(h.to_h).to eq(expected_result)
+      end
+
+      it 'deep mixed' do
+        h = subject.new
+        h[' All'] = {
+          mighty: :push,
+          ' bziuuuu' => 'skibidish',
+          'all_over': ['the', 'place', Array, {}]
+        }
+        h.gravity = 9.81
+        h[:config] = :off
+        h[:' symbolic string'] = 36
+        h['geek'] = 'week'
+        h[27] = 57
+
+        expected_result = {
+          ' All' => {
+            mighty: :push,
+            ' bziuuuu' => 'skibidish',
+            'all_over': ['the', 'place', Array, {}]
+          },
+          gravity: 9.81,
+          config: :off,
+          ' symbolic string' => 36,
+          geek: 'week',
+          27 => 57
+        }
+        expect(h.to_h).to eq(expected_result)
+      end
+    end
+  end
+
+  context 'indifferent access' do
+    it 'symbolic key' do
+      h = subject.new
+      h[:intellect] = true
+      expect(h['intellect']).to eq(true)
+      expect(h[:intellect]).to eq(true)
+      expect(h.intellect).to eq(true)
+    end
+
+    it 'string key' do
+      h = subject.new
+      h['flow'] = 384
+      expect(h['flow']).to eq(384)
+      expect(h[:flow]).to eq(384)
+      expect(h.flow).to eq(384)
+    end
+
+    it 'simple symbolic string' do
+      h = subject.new
+      h[:'here_we_go'] = 'doooooooog'
+      expect(h[:'here_we_go']).to eq('doooooooog')
+      expect(h['here_we_go']).to eq('doooooooog')
+      expect(h.here_we_go).to eq('doooooooog')
+    end
+
+    it 'complex symbolic string' do
+      h = subject.new
+      h[:' Rick and Morty '] = 2.25
+      expect(h[:' Rick and Morty ']).to eq(2.25)
+      expect(h[' Rick and Morty ']).to eq(2.25)
+    end
+
+    it 'numeric key' do
+      h = subject.new
+      h[25] = 90.0
+      expect(h[25]).to eq(90.0)
+      expect(h['25']).to eq(90.0)
+    end
+  end
+
+  describe '#initialize' do
+    context 'with `Hash`' do
+      it 'empty' do
+        h = subject.new({})
+        expect(h.to_h).to eq({})
+      end
+
+      it 'deep mixed' do
+        value = {
+          sinnerman: 'runs to the',
+          'river': :and_then_he_is_like,
+          " don't": {
+            'you' => [:see, 'me', 'praing' => '?'],
+            inside: [
+              ['an'],
+              { array: ['of', :an, Array] }
+            ]
+          }
+        }
+        expected_result = {
+          sinnerman: 'runs to the',
+          'river': :and_then_he_is_like,
+          " don't" => {
+            you: [:see, 'me', praing: '?'],
+            inside: [
+              ['an'],
+              { array: ['of', :an, Array] }
+            ]
+          }
+        }
+        h = subject.new(value)
+        expect(h.to_h).to eq(expected_result)
+      end
+
+      it 'numeric key' do
+        h = subject.new(25 => 'embarassing', 8.25 => true)
+        expect(h[25]).to eq('embarassing')
+        expect(h[8.25]).to eq(true)
+      end
+    end
   end
 end

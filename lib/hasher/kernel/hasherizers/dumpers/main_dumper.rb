@@ -21,6 +21,7 @@ module Kernel
             ::Kernel::Hasherizers::Dumpers::KeyValuePairNilHandler.new,
             ::Kernel::Hasherizers::Dumpers::ArrayHandler.new,
             ::Kernel::Hasherizers::Dumpers::HasherHandler.new,
+            ::Kernel::Hasherizers::Dumpers::IntegerHandler.new,
             ::Kernel::Hasherizers::Dumpers::DefaultHandler.new
           ]
         end

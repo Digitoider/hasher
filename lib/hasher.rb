@@ -34,11 +34,6 @@ require 'hasher/kernel/serializers/hasherizer'
 require 'pry-byebug'
 
 class Hasher
-  # def self.new(value = nil)
-  #   return ::Kernel::Hasherizer.new.to_hasher(value) if value.is_a?(Hash)
-  #   super
-  # end
-
   def initialize(initial_value = {})
     return if initial_value == {} || !initial_value.is_a?(Hash)
     hasher = ::Kernel::Hasherizer.new.to_hasher(initial_value)
