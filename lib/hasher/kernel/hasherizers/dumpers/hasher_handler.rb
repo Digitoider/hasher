@@ -11,7 +11,7 @@ module Kernel
         end
 
         def can_hasherize?(node)
-          hasher?(node) || node.respond_to?(:value) && hasher?(node.value)
+          hasher?(node) || node?(node) && hasher?(node.value)
         end
 
         private

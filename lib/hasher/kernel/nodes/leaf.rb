@@ -31,13 +31,25 @@ module Kernel
     class ArraySubstitute < Array
       attr_accessor :reference_original
 
-      def << (elem)
+      def <<(elem)
         # binding.pry
-        @reference_original << elem
+        resolve_push(elem)
       end
 
       def push(elem)
-        @reference_original << elem
+        resolve_push(elem)
+      end
+
+      private
+
+      def resolve_push(elem)
+        binding.pry if elem == {d: 'yeah!'}
+        node = main_resolver.resolve(value: elem)
+        @reference_original << node
+      end
+
+      def main_resolver
+        @main_resolver ||= ::Kernel::Resolvers::MainResolver.new
       end
     end
   end

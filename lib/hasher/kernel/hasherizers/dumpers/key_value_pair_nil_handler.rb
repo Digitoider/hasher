@@ -3,13 +3,13 @@
 module Kernel
   module Hasherizers
     module Dumpers
-      class KeyValuePairNilHandler
+      class KeyValuePairNilHandler < BaseHandler
         def to_h(_node)
           {}
         end
 
         def can_hasherize?(node)
-          node.is_a?(::Kernel::Nodes::Base) && node.key.nil? && node.value.nil?
+          node?(node) && node.key.nil? && node.value.nil?
         end
       end
     end

@@ -121,9 +121,48 @@ RSpec.describe Hasher do
       it 'using `push`' do
         h = subject.new
         h.coords = []
+        # binding.pry
         h.coords.push(lat: 45.36, lng: 63.54)
-        expect(h.array[0].lat).to eq(45.36)
-        expect(h.array[0].lng).to eq(63.54)
+        expect(h.coords[0].lat).to eq(45.36)
+        expect(h.coords[0].lng).to eq(63.54)
+      end
+
+      it 'deep' do
+        h = subject.new
+        h.a = [{ b: :jes }, 1, { 5 => [1, {}, 3 => 5] }]
+        expect(h.a[0].b).to eq(:jes)
+        expect(h.a[1]).to eq(1)
+        expect(h.a[2][5][0]).to eq(1)
+        expect(h.a[2]['5'][0]).to eq(1)
+        expect(h.a[2][5][1].to_h).to eq({})
+        expect(h.a[2][5][2][3]).to eq(5)
+        expect(h.a[2][5][2][:'3']).to eq(5)
+      end
+
+      it 'included arrays' do
+        h = subject.new
+        h.arr1 = []
+        h.arr1 << [2, { b: 3 }]
+        h.arr1[0][1].c = [{}]
+        h.arr1[0][1].c << [12]
+        h.arr1[0][1].c[1].push('d' => 'yeah!')
+
+        {
+          arr1: [
+            [
+              2,
+              {
+                b: 3,
+                c: [{}, [12, d: 'yeah']]
+              }
+            ]
+          ]
+        }
+
+        expect(h.arr1[0][0]).to eq(2)
+        expect(h.arr1[0][1].c[0]).to be_a(subject)
+        expect(h.arr1[0][1].c[1][0]).to eq(12)
+        expect(h.arr1[0][1].c[1][1].d).to eq('yeah!')
       end
     end
   end
@@ -133,6 +172,32 @@ RSpec.describe Hasher do
       it 'empty hash' do
         h = subject.new
         expect(h.to_h).to eq({})
+      end
+    end
+
+    context 'with `<<` and `push`' do
+      it 'mixed' do
+        h = subject.new
+        h.arr1 = []
+        h.arr1 << [2, { b: 3 }]
+        h.arr1[0][1].c = [{}]
+        h.arr1[0][1].c << [12]
+        h.arr1[0][1].c[1].push('d' => 'yeah!')
+
+        expected_result = {
+          arr1: [
+            [
+              2,
+              {
+                b: 3,
+                c: [{}, [12, d: 'yeah']]
+              }
+            ]
+          ]
+        }
+
+        binding.pry
+        expect(h.to_h).to eq(expected_result)
       end
     end
 

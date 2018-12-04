@@ -3,7 +3,7 @@
 module Kernel
   module Hasherizers
     module Dumpers
-      class BasicTypeHandler
+      class BasicTypeHandler < BaseHandler
         def to_h(node)
           node
         end
