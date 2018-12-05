@@ -16,40 +16,20 @@ module Kernel
       end
 
       def value
-        return @value unless @value.is_a?(Array)
-
-        return_value = @value.map do |elem|
-          elem.is_a?(Base) ? elem.value : elem
-        end
-
-        return_value = ArraySubstitute.new(return_value)
-        return_value.reference_original = @value
-        return_value
-      end
-    end
-
-    class ArraySubstitute < Array
-      attr_accessor :reference_original
-
-      def <<(elem)
-        # binding.pry
-        resolve_push(elem)
-      end
-
-      def push(elem)
-        resolve_push(elem)
+        return array_substitute if @value.is_a?(Array)
+        @value
       end
 
       private
 
-      def resolve_push(elem)
-        binding.pry if elem == {d: 'yeah!'}
-        node = main_resolver.resolve(value: elem)
-        @reference_original << node
-      end
+      def array_substitute
+        return_value = @value.map do |elem|
+          elem.is_a?(Base) ? elem.value : elem
+        end
 
-      def main_resolver
-        @main_resolver ||= ::Kernel::Resolvers::MainResolver.new
+        return_value = ::Kernel::ArraySubstitute.new(return_value)
+        return_value.original_value_reference = @value
+        return_value
       end
     end
   end

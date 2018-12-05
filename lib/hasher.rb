@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'hasher/kernel/errors/not_implemented_error'
+require 'hasher/kernel/dirty/array_substitute'
 require 'hasher/kernel/dirty/indifferentiator'
 require 'hasher/kernel/hasherizers/dumpers/main_dumper'
 require 'hasher/kernel/hasherizers/dumpers/base_handler'

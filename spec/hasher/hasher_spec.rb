@@ -147,22 +147,35 @@ RSpec.describe Hasher do
         h.arr1[0][1].c << [12]
         h.arr1[0][1].c[1].push('d' => 'yeah!')
 
-        {
-          arr1: [
-            [
-              2,
-              {
-                b: 3,
-                c: [{}, [12, d: 'yeah']]
-              }
-            ]
-          ]
-        }
-
         expect(h.arr1[0][0]).to eq(2)
         expect(h.arr1[0][1].c[0]).to be_a(subject)
         expect(h.arr1[0][1].c[1][0]).to eq(12)
         expect(h.arr1[0][1].c[1][1].d).to eq('yeah!')
+      end
+    end
+
+    context 'with `+`' do
+      it 'not array' do
+        h = subject.new
+        h.a = []
+        expect { h.a + 5 }.to raise_error(TypeError)
+      end
+
+      it 'array' do
+        h = subject.new
+        h.a = []
+        h.a + [1]
+        h.a + [2, [3, [4]]]
+        expect(h.a).to eq([1, 2, [3, [4]]])
+      end
+
+      it 'mixed' do
+        h = subject.new
+        h.a = []
+        h.a + [1, { b: 2 }]
+        expect(h.a[0]).to eq(1)
+        expect(h.a[1]).to be_a(subject)
+        expect(h.a[1].b).to eq(2)
       end
     end
   end
@@ -190,14 +203,24 @@ RSpec.describe Hasher do
               2,
               {
                 b: 3,
-                c: [{}, [12, d: 'yeah']]
+                c: [{}, [12, d: 'yeah!']]
               }
             ]
           ]
         }
 
-        binding.pry
         expect(h.to_h).to eq(expected_result)
+      end
+    end
+
+    context 'with `+`' do
+      it 'mixed' do
+        h = subject.new
+        h.a = []
+        h.a + [1, { b: 2 }]
+        h.a + [[]]
+        h.a[2] + [4, 5, 6]
+        expect(h.to_h).to eq(a: [1, { b: 2 }, [4, 5, 6]])
       end
     end
 

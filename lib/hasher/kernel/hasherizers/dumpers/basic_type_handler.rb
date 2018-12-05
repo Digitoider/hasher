@@ -17,7 +17,8 @@ module Kernel
         def denied_types
           [
             ::Hasher,
-            ::Kernel::Nodes::Base
+            ::Kernel::Nodes::Base,
+            Array
           ]
         end
       end
