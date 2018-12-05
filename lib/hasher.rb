@@ -56,6 +56,7 @@ class Hasher
   end
 
   def method_missing(method_name, *args)
+    puts method_name
     action = action_resolver.resolve(method_name, args.first, tree)
     return self if action.assigned?
     action.value
