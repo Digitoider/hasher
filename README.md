@@ -1,3 +1,5 @@
+https://img.shields.io/badge/version-1.1-green.svg
+
 # Hasher
 
 Hasher is a ruby gem that allows you to work with Hash the javascript way. Wonder how? Just follow me...

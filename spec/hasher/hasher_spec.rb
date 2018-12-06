@@ -153,6 +153,23 @@ RSpec.describe Hasher do
         expect(h.arr1[0][1].c[1][1].d).to eq('yeah!')
       end
     end
+
+    context 'array `[]=`' do
+      it 'assigns' do
+        h = Hasher.new
+
+        h.items = []
+        h.items[0] = { id: 0, gang: 'Beatles' }
+        h.items[1] = 5
+        h.items[3] = 'six'
+
+        expect(h.items[0].id).to eq(0)
+        expect(h.items[0].gang).to eq('Beatles')
+        expect(h.items[1]).to eq(5)
+        expect(h.items[2]).to eq(nil)
+        expect(h.items[3]).to eq('six')
+      end
+    end
   end
 
   describe '#to_h' do

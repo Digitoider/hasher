@@ -12,6 +12,10 @@ module Kernel
       resolve_push(elem)
     end
 
+    def []=(index, elem)
+      @original_value_reference[index] = main_resolver.resolve(value: elem)
+    end
+
     private
 
     def resolve_push(elem)
