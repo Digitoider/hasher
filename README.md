@@ -1,4 +1,4 @@
-https://img.shields.io/badge/version-1.1-green.svg
+![version: 1.1](https://img.shields.io/badge/version-1.1-green.svg)
 
 # Hasher
 
