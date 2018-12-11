@@ -27,6 +27,12 @@ module Kernel
       leaf?(node) ? node.value : node
     end
 
+    def keys
+      return [] if @root.key.nil? && @root.value.nil?
+      return [@root.key] if @root.leaf?
+      @root.keys
+    end
+
     protected
 
     def define_root(root)

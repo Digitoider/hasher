@@ -46,6 +46,29 @@ class Hasher
     ::Kernel::Hasherizer.new.to_h(tree.root)
   end
 
+  def each
+    return method_missing(:each) unless block_given?
+
+    keys = tree.keys
+    keys.each do |key|
+      value = method_missing(key)
+      yield(key, value)
+    end
+  end
+
+  def map
+    return method_missing(:map) unless block_given?
+
+    tree.keys.map do |key|
+      value = method_missing(key)
+      yield(key, value)
+    end
+  end
+
+  def has_key?(key)
+    tree.keys.include?(key)
+  end
+
   def []=(key, value)
     action_resolver.resolve_assigning(key, value, tree)
     # self

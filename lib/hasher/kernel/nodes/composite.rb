@@ -11,6 +11,10 @@ module Kernel
         true
       end
 
+      def keys
+        children.map(&:key)
+      end
+
       def children
         @children ||= []
       end
