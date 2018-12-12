@@ -64,6 +64,10 @@ class Hasher
     end
   end
 
+  def ==(other)
+    to_h == other.to_h
+  end
+
   def has_key?(key)
     indifferent_key = ::Kernel::Dirty::Indifferentiator.new.define(key)
     tree.keys.include?(indifferent_key)
