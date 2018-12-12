@@ -401,4 +401,42 @@ RSpec.describe Hasher do
       end
     end
   end
+
+  describe '#has_key?' do
+    it 'true' do
+      h = subject.new
+      h.a = 5
+      h[6] = :number
+
+      expect(h.has_key?(:a)).to eq(true)
+      expect(h.has_key?('a')).to eq(true)
+      expect(h.has_key?(:'a')).to eq(true)
+
+      expect(h.has_key?(6)).to eq(true)
+      expect(h.has_key?('6')).to eq(true)
+      expect(h.has_key?(:'6')).to eq(true)
+    end
+
+    it 'false' do
+      h = subject.new
+      h.a = 5
+
+      expect(h.has_key?(:b)).to eq(false)
+      expect(h.has_key?('b')).to eq(false)
+      expect(h.has_key?(:'b')).to eq(false)
+    end
+
+    it 'mixed' do
+      h = subject.new
+      h[5] = :number
+
+      expect(h.has_key?(5)).to eq(true)
+      expect(h.has_key?('5')).to eq(true)
+      expect(h.has_key?(:'5')).to eq(true)
+
+      expect(h.has_key?(:p)).to eq(false)
+      h.p = {}
+      expect(h.has_key?(:p)).to eq(true)
+    end
+  end
 end

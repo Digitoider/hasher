@@ -49,8 +49,7 @@ class Hasher
   def each
     return method_missing(:each) unless block_given?
 
-    keys = tree.keys
-    keys.each do |key|
+    tree.keys.each do |key|
       value = method_missing(key)
       yield(key, value)
     end
@@ -66,7 +65,8 @@ class Hasher
   end
 
   def has_key?(key)
-    tree.keys.include?(key)
+    indifferent_key = ::Kernel::Dirty::Indifferentiator.new.define(key)
+    tree.keys.include?(indifferent_key)
   end
 
   def []=(key, value)

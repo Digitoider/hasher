@@ -28,7 +28,7 @@ module Kernel
     end
 
     def keys
-      return [] if @root.key.nil? && @root.value.nil?
+      return [] if @root.key.nil? && @root.value.nil? && @root.leaf?
       return [@root.key] if @root.leaf?
       @root.keys
     end
