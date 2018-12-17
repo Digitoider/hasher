@@ -402,41 +402,269 @@ RSpec.describe Hasher do
     end
   end
 
-  describe '#has_key?' do
+  describe '#key?' do
     it 'true' do
       h = subject.new
       h.a = 5
       h[6] = :number
 
-      expect(h.has_key?(:a)).to eq(true)
-      expect(h.has_key?('a')).to eq(true)
-      expect(h.has_key?(:'a')).to eq(true)
+      expect(h.key?(:a)).to eq(true)
+      expect(h.key?('a')).to eq(true)
+      expect(h.key?(:'a')).to eq(true)
 
-      expect(h.has_key?(6)).to eq(true)
-      expect(h.has_key?('6')).to eq(true)
-      expect(h.has_key?(:'6')).to eq(true)
+      expect(h.key?(6)).to eq(true)
+      expect(h.key?('6')).to eq(true)
+      expect(h.key?(:'6')).to eq(true)
     end
 
     it 'false' do
       h = subject.new
       h.a = 5
 
-      expect(h.has_key?(:b)).to eq(false)
-      expect(h.has_key?('b')).to eq(false)
-      expect(h.has_key?(:'b')).to eq(false)
+      expect(h.key?(:b)).to eq(false)
+      expect(h.key?('b')).to eq(false)
+      expect(h.key?(:'b')).to eq(false)
     end
 
     it 'mixed' do
       h = subject.new
       h[5] = :number
 
-      expect(h.has_key?(5)).to eq(true)
-      expect(h.has_key?('5')).to eq(true)
-      expect(h.has_key?(:'5')).to eq(true)
+      expect(h.key?(5)).to eq(true)
+      expect(h.key?('5')).to eq(true)
+      expect(h.key?(:'5')).to eq(true)
 
-      expect(h.has_key?(:p)).to eq(false)
+      expect(h.key?(:p)).to eq(false)
       h.p = {}
-      expect(h.has_key?(:p)).to eq(true)
+      expect(h.key?(:p)).to eq(true)
+    end
+  end
+
+  describe '#dig' do
+    it 'chain of keys exists' do
+      hash = {
+        a: {
+          'b' => {
+            3 => 'exists'
+          }
+        }
+      }
+      h = subject.new(hash)
+
+      expect(h.dig(:a, 'b', 3)).to eq('exists')
+      expect(h.dig('a', :b, '3')).to eq('exists')
+      expect(h.dig(:'a', :'b', :'3')).to eq('exists')
+      expect(h.dig('a', 'b', '3')).to eq('exists')
+      expect(h.dig(:a, :b, 3)).to eq('exists')
+    end
+
+    it 'chain of keys does not exist' do
+      h = subject.new
+      expect(h.dig(:a, :b, :c, 'd', 15)).to eq(nil)
+      expect(h.dig(:a)).to eq(nil)
+      expect(h.dig('a')).to eq(nil)
+      expect(h.dig(4)).to eq(nil)
+      expect(h.dig('5')).to eq(nil)
+      expect(h.dig(6, '9')).to eq(nil)
+    end
+  end
+
+  describe '#map' do
+    it 'only keys' do
+      h = subject.new
+      h.a = 5
+      h[4] = 'sugar'
+      h.v = nil
+
+      expect(h.map { |key| key }).to eq([:a, '4', :v])
+    end
+
+    it 'with values' do
+      h = subject.new
+      h.a = 5
+      h[4] = 'sugar'
+      h.v = nil
+
+      expect(h.map { |_key, value| value }).to eq([5, 'sugar', nil])
+    end
+
+    it 'transforming values' do
+      h = subject.new
+      h.a = 3
+      h.b = 6
+      h.c = 9
+
+      expect(h.map { |_key, value| value + 1 }).to eq([4, 7, 10])
+    end
+  end
+
+  describe '#each' do
+    it 'preforms `#each` on keys and values' do
+      h = subject.new
+      h.a = { id: 1 }
+      h.b = { id: 2 }
+      h.c = { id: 3 }
+
+      result = []
+      h.each { |key, value| result << "#{key}::#{value.id}" }
+      expect(result).to eq(['a::1', 'b::2', 'c::3'])
+    end
+  end
+
+  describe '#each_value' do
+    it 'preforms `#each` on values only' do
+      h = subject.new
+      h.a = { id: 1 }
+      h.b = { id: 2 }
+      h.c = { id: 3 }
+
+      result = []
+      h.each_value { |value| result << ":#{value.id}:" }
+      expect(result).to eq([':1:', ':2:', ':3:'])
+    end
+  end
+
+  describe '#==' do
+    context '`Hash` with `Hasher`' do
+      it 'true' do
+        hash = { a: [5, { 7.8 => '11', b: 12 }] }
+        h = subject.new(hash)
+        expect(h == hash).to eq(true)
+      end
+
+      it 'false' do
+        hash = { '5' => 'string key' }
+        h = subject.new(hash)
+        expect(h == hash).to eq(false)
+      end
+    end
+
+    context '`Hasher` with `Hasher`' do
+      it 'true' do
+        h1 = subject.new(a: 1, b: 2, c: [1, { 4 => 5 }])
+        h2 = subject.new('a' => 1, b: 2, c: [1, { '4' => 5 }])
+        expect(h1 == h2).to eq(true)
+        expect(h2 == h1).to eq(true)
+      end
+
+      it 'false' do
+        h1 = subject.new
+        h2 = subject.new
+
+        h1.a = 5
+        h2.a = 6
+
+        expect(h1 == h2).to eq(false)
+      end
+    end
+  end
+
+  describe '#delete' do
+    context 'composite' do
+      it 'key exists' do
+        h = subject.new
+        h.a = 5
+        h.b = 7
+        expect(h.to_h).to eq(a: 5, b: 7)
+        result = h.delete(:a)
+        expect(result).to eq(5)
+        expect(h.a).to eq(nil)
+        expect(h.to_h).to eq(b: 7)
+      end
+
+      it 'key does not exist' do
+        h = subject.new
+        h.a = { b: [1, 3 => 'three', k: 'awesome'] }
+        result = h.delete(:b)
+        expect(result).to eq(nil)
+        expect(h.to_h).to eq(a: { b: [1, 3 => 'three', k: 'awesome'] })
+      end
+    end
+
+    context 'leaf' do
+      it 'key exists' do
+        h = subject.new
+        h.a = { unbelievable: { power: 1 } }
+        expect(h.delete('a').to_h).to eq(unbelievable: { power: 1 })
+        expect(h.to_h).to eq({})
+      end
+
+      it 'key does not exist' do
+        h = subject.new
+        expect(h.delete('abra')).to eq(nil)
+        expect(h.to_h).to eq({})
+      end
+    end
+
+    context 'indifferent keys' do
+      it 'string key' do
+        h = subject.new
+        h.dog = { b: 'labrador' }
+        h.style = ['extreme']
+        result = h.delete('dog')
+        expect(result.to_h).to eq(b: 'labrador')
+        expect(h.to_h).to eq(style: ['extreme'])
+      end
+
+      it 'symbolic key' do
+        h = subject.new
+        h.gorillaz = 'is a nice gang'
+        value = h.delete(:gorillaz)
+        expect(value).to eq('is a nice gang')
+        expect(h.to_h).to eq({})
+      end
+
+      it 'numeric key' do
+        h = subject.new
+        h[15]  = 'fifteen'
+        h[6.6] = 'six point six'
+        h[30]  = 'thirty'
+
+        expect(h.delete(15)).to eq('fifteen')
+        expect(h.to_h).to eq(6.6 => 'six point six', 30 => 'thirty')
+
+        expect(h.delete('6.6')).to eq('six point six')
+        expect(h.to_h).to eq(30 => 'thirty')
+
+        expect(h.delete(:'30')).to eq('thirty')
+        expect(h.to_h).to eq({})
+
+        expect(h.delete(:non_existing)).to eq(nil)
+        expect(h.to_h).to eq({})
+      end
+    end
+  end
+
+  describe '#delete_if' do
+    it 'with values only' do
+      h = subject.new
+      h.a = { gang: 1 }
+      h.b = { gang: 2 }
+      h.c = { gang: 3 }
+      h.d = { gang: 4 }
+
+      h.delete_if { |_key, value| value.gang > 2 }
+
+      expect(h.to_h).to eq(a: { gang: 1 }, b: { gang: 2 })
+      expect(h.c).to eq(nil)
+      expect(h.d).to eq(nil)
+    end
+
+    it 'with keys only' do
+      hash = { quick: 1, brown: 2, fox: 3, jumps: 4 }
+      h = subject.new(hash)
+      h.delete_if { |key| %w[quick fox].include?(key.to_s) }
+      expect(h.to_h).to eq(brown: 2, jumps: 4)
+      expect(h.quick).to eq(nil)
+      expect(h.fox).to eq(nil)
+    end
+
+    it 'with keys and values' do
+      hash = { red: :red, green: :green, blue: 'yellow' }
+      h = subject.new(hash)
+      h.delete_if { |key, value| key.to_s != value.to_s }
+      expect(h.to_h).to eq(red: :red, green: :green,)
+      expect(h.blue).to eq(nil)
     end
   end
 end

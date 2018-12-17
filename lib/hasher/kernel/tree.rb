@@ -27,13 +27,32 @@ module Kernel
       leaf?(node) ? node.value : node
     end
 
+    def delete_key(key)
+      return nil if root_empty?
+      value = retrieve(key)
+
+      return nil if value.nil?
+
+      if @root.leaf? && @root.key == key
+        @root = ::Kernel::Nodes::Leaf.new
+        return value
+      end
+
+      root.delete_key(key)
+      value
+    end
+
     def keys
-      return [] if @root.key.nil? && @root.value.nil? && @root.leaf?
+      return [] if root_empty?
       return [@root.key] if @root.leaf?
       @root.keys
     end
 
     protected
+
+    def root_empty?
+      @root.leaf? && @root.key.nil? && @root.value.nil?
+    end
 
     def define_root(root)
       node?(root) ? root : ::Kernel::Nodes::Leaf.new(key: nil, value: root)
@@ -48,7 +67,7 @@ module Kernel
     end
 
     def leaf?(node)
-      node.leaf? rescue false
+      node?(node) && node.leaf?
     end
   end
 end

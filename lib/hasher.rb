@@ -55,6 +55,15 @@ class Hasher
     end
   end
 
+  def each_value
+    return method_missing(:each_value) unless block_given?
+
+    tree.keys.each do |key|
+      value = method_missing(key)
+      yield(value)
+    end
+  end
+
   def map
     return method_missing(:map) unless block_given?
 
@@ -64,12 +73,36 @@ class Hasher
     end
   end
 
+  # TODO: delete_if { block }
+  def delete(key = nil)
+    return method_missing(:delete) if key.nil?
+
+    tree.delete_key(indifferentiator.define(key))
+  end
+
+  def delete_if
+    return method_missing(:delete_if) unless block_given?
+
+    tree.keys.each do |key|
+      value = method_missing(key)
+      delete(key) if yield(key, value)
+    end
+  end
+
+  def dig(*keys)
+    return method_missing(:dig) if keys.count.zero?
+
+    value = method_missing(keys.shift)
+    keys.each { |key| value = value[key] rescue nil }
+    value
+  end
+
   def ==(other)
     to_h == other.to_h
   end
 
-  def has_key?(key)
-    indifferent_key = ::Kernel::Dirty::Indifferentiator.new.define(key)
+  def key?(key)
+    indifferent_key = indifferentiator.define(key)
     tree.keys.include?(indifferent_key)
   end
 
@@ -100,5 +133,9 @@ class Hasher
 
   def action_resolver
     @action_resolver ||= ::Kernel::ActionResolver.new
+  end
+
+  def indifferentiator
+    @indifferentiator ||= ::Kernel::Dirty::Indifferentiator.new
   end
 end

@@ -23,6 +23,12 @@ module Kernel
         children.find { |node| node.key == key }
       end
 
+      def delete_key(key)
+        node = retrieve_child(key)
+        @children -= [node]
+        node
+      end
+
       def value=(node)
         found_child = children.find { |child| child.key == node.key }
         found_child.nil? ? children << node : found_child.value = node
