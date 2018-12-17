@@ -126,13 +126,13 @@ Calling `to_h` on a `Hasher` returns a `Hash` that can be later turned into JSON
 ```ruby
 songs = Hasher.new
 
-songs.items = []
-songs.items[0] = { id: 0, gang: 'Beatles' }
-songs.items << { id: 1, gang: 'Wardruna' }
-songs.items[2] = {}
-songs.items[2].id = 2
-songs.items[2].gang = 'The Chieftains'
-songs.total = 3
+songs.items         =  []
+songs.items[0]      =  { id: 0, gang: 'Beatles' }
+songs.items         << { id: 1, gang: 'Wardruna' }
+songs.items[2]      =  {}
+songs.items[2].id   =  2
+songs.items[2].gang =  'The Chieftains'
+songs.total         =  3
 songs.to_h
 # =>
       {
@@ -145,6 +145,109 @@ songs.to_h
       }
 ```
 
+### `key?(key)`
+Returns *true* if an instance of a `Hasher` has such key
+```ruby
+h = Hasher.new(flowers: { are: 'beautiful' })
 
+h.key?('flowers')     # => true
+h.key?(:flowers)      # => true
+h.key?(:are)          # => false
+h.flowers.key?(:are)  # => true
+h.flowers.key?('are') # => true
+```
 
+### `dig(*keys)`
+Returns value if passed chain of keys exists. It does not metter whether you
+use symbolic key or string or even numeric key:
+```ruby
+hash = {
+  :magic => { happens: { all: { the: 'time' } } },
+  4      => { 7.1 => 'int and float'}
+}
+h = Hasher.new(hash)
 
+h.dig('magic', :happens, 'all', :the)     # => "time"
+h.dig(4, 7.1)                             # => "int and float"
+h.dig('4', 7.1)                           # => "int and float"
+h.dig(4, '7.1')                           # => "int and float"
+```
+
+If passed chain of keys can't be resolved, the *nil* is returned:
+```ruby
+h = Hasher.new
+
+h.dig(8, :there, 'is', :no, :such, 'key') # => nil
+```
+
+Stil, if you want to create key named `dig` with some value, you are able to
+do that:
+```ruby
+h = Hasher.new
+
+h.dig = 5
+h.dig                   # => 5
+h.dig('dig')            # => 5
+h.dig('unknown', 'key') # => nil
+```
+
+### `==`
+An instance of `Hasher` can be compared with another instance of `Hasher` or
+even a `Hash`:
+
+```ruby
+hash = {
+  gangs: [
+    { id: 1 },
+    { id: 2 },
+    { id: 3 }
+  ],
+  total: 3
+}
+h1 = Hasher.new(hash)
+h2 = Hasher.new(hash)
+h1 == hash               # => true
+h2 == hash               # => true
+h1.gangs[0] == { id: 1 } # => true
+h1 == h2                 # => true
+
+h1.total = 4
+h1 == h2                 # => false
+```
+
+### `delete(key)`
+It removes value that matches any passed key. If such a key doesn't exist, it
+returns *nil*:
+
+```ruby
+h = Hasher.new(a: 5, b: 7)
+
+h.delete(:a)             # => 5
+h.to_h                   # => { b: 7 }
+h.delete('b')            # => 7
+h.to_h                   # => {}
+h.delete('non_existing') # => nil
+```
+
+As you just saw in the example above, method `delete` works with indifferent
+keys. The same rule could be applied to numeric keys:
+
+```ruby
+h = Hasher.new
+
+h[15]  = 'fifteen'
+h[6.6] = 'six point six'
+h[30]  = 'thirty'
+
+h.delete(15)             # =>  'fifteen'
+h.to_h)                  # => { 6.6 => 'six point six', 30 => 'thirty' }
+
+h.delete('6.6')          # => 'six point six'
+h.to_h                   # => { 30 => 'thirty' }
+
+h.delete(:'30')          # => 'thirty'
+h.to_h                   # => {}
+
+h.delete(:non_existing)  # => nil
+h.to_h                   # => {}
+```

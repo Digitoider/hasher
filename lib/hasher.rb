@@ -98,7 +98,7 @@ class Hasher
   end
 
   def ==(other)
-    to_h == other.to_h
+    to_h == other.to_h rescue false
   end
 
   def key?(key)
