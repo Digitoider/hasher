@@ -2,10 +2,10 @@
 
 Gem::Specification.new do |spec|
   spec.name        = 'hasher'
-  spec.version     = '0.0.1'
-  spec.date        = '2018-08-09'
-  spec.summary     = 'This gem provides ...'
-  spec.description = 'This gem provides ...'
+  spec.version     = '1.1.0'
+  spec.date        = '2018-12-18'
+  spec.summary     = 'Work with hash the JavaScript way!'
+  spec.description = 'This gem allows you to work with hash structure the JavaScript way!'
   spec.authors     = ['Alexander Brjakin']
   spec.email       = 'digitoider@gmail.com'
   spec.files       = ['lib/hasher']
