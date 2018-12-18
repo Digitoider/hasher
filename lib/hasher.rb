@@ -103,6 +103,17 @@ class Hasher
     tree.keys.include?(indifferent_key)
   end
 
+  def value?(value)
+    hash  = to_h
+    value = Hasher.new(value: value).to_h[:value]
+    key   = hash.keys.find { |k| hash[k] == value }
+    !key.nil?
+  end
+
+  def empty?
+    to_h == {}
+  end
+
   def []=(key, value)
     action_resolver.resolve_assigning(key, value, tree)
     # self

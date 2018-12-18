@@ -440,6 +440,48 @@ RSpec.describe Hasher do
     end
   end
 
+  describe '#empty?' do
+    it 'true' do
+      h = subject.new
+
+      expect(h.empty?).to eq(true)
+    end
+
+    it 'false' do
+      h = subject.new(knowladge: 'is awesome')
+
+      expect(h.empty?).to eq(false)
+    end
+
+    it 'after removal' do
+      h = subject.new
+
+      h.rick = 'Rick'
+      expect(h.empty?).to eq(false)
+      h.delete(:rick)
+      expect(h.empty?).to eq(true)
+    end
+  end
+
+  describe '#value?' do
+    it 'simple' do
+      h = subject.new
+
+      expect(h.value?(5)).to eq(false)
+      h.a = 5
+      expect(h.value?(5)).to eq(true)
+    end
+
+    it 'deep' do
+      h = subject.new
+
+      h.a = [1, { b: 2, c: [3, 4] }, [5, 6]]
+      expect(h.value?([1, { b: 2, c: [3, 4] }, [5, 6]])).to eq(true)
+      a = h.a
+      expect(h.value?(a)).to eq(true)
+    end
+  end
+
   describe '#dig' do
     it 'chain of keys exists' do
       hash = {
