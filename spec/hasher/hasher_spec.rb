@@ -219,7 +219,7 @@ RSpec.describe Hasher do
           }
         ]
         h.hold = {}
-        h.it = Hasher.new
+        h.it = subject.new
         h.it.man = false
         h.sym = :symbol
         h.deep = {}

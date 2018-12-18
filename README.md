@@ -138,11 +138,65 @@ songs.to_h
       {
         items: [
           { id: 0, gang: 'Beatles' },
-          { id: 1, gang: 'Wardruna' }
+          { id: 1, gang: 'Wardruna' },
           { id: 2, gang: 'The Chieftains' }
         ],
         total: 3
       }
+```
+_**Important!**_ Using `to_h` as a key. You can assign value to a `:to_h` key, but calling `to_h` on
+an instance of a `Hasher` will return a `Hash` representation of a `Hasher` structure:
+```ruby
+h = Hasher.new
+
+h.a    = 'This is :a key'
+h.to_h = 'This is :to_h key'
+
+h[:to_h]   # => "This is :to_h key"
+h['to_h']  # => "This is :to_h key"
+h.to_h     # => { a: "This is :a key", to_h: "This is :to_h key" }
+```
+
+### `each`
+Allows you to iterate through each `|key|` or `|key, value|` pair:
+```ruby
+h = Hasher.new(a: { id: 1 }, b: { id: 2 }, c: { id: 3 })
+
+result = []
+
+h.each { |key, value| result << "#{key}::#{value.id}" }
+
+pp result    # => ["a::1", "b::2", "c::3"]
+```
+
+### `each_value`
+Allows you to iterate through each `|value|`:
+```ruby
+h = Hasher.new(a: { id: 1 }, b: { id: 2 }, c: { id: 3 })
+
+result = []
+
+h.each_value { |value| result << value.id }
+
+pp result    # => [1, 2, 3]
+```
+
+### `map`
+Allows you to map through each `|key|` or `|key, value|` pair:
+```ruby
+h = Hasher.new(hello: 'world', mister: 'Jackson')
+
+result = h.map { |key, value| "#{key}::#{value}" }
+
+pp result    # => ["hello::world", "mister::Jackson"]
+```
+`map` also can be used as a key:
+```ruby
+h = Hasher.new
+
+h.map = 'mapper'
+h.map                                 # => 'mapper'
+h.map { |key, value| [key, value] }   # => [[:map, 'mapper']]
 ```
 
 ### `key?(key)`
@@ -191,7 +245,7 @@ h.dig('dig')            # => 5
 h.dig('unknown', 'key') # => nil
 ```
 
-### `==`
+### Comparison `==`
 An instance of `Hasher` can be compared with another instance of `Hasher` or
 even a `Hash`:
 
@@ -240,7 +294,7 @@ h[6.6] = 'six point six'
 h[30]  = 'thirty'
 
 h.delete(15)             # =>  'fifteen'
-h.to_h)                  # => { 6.6 => 'six point six', 30 => 'thirty' }
+h.to_h                  # => { 6.6 => 'six point six', 30 => 'thirty' }
 
 h.delete('6.6')          # => 'six point six'
 h.to_h                   # => { 30 => 'thirty' }
@@ -250,4 +304,24 @@ h.to_h                   # => {}
 
 h.delete(:non_existing)  # => nil
 h.to_h                   # => {}
+```
+
+You can use `delete` as a key in an instance of `Hasher`:
+```ruby
+h = Hasher.new
+
+h.delete = 'no'
+h.delete         # => "no"
+```
+
+### `delete_if`
+Removes keys with values if a condition in the block returns *true*
+```ruby
+h = Hasher.new(red: :red, blue: :blue, green: 'not_green')
+
+h.delete_if { |key, value| key.to_s == value.to_s }
+
+h.to_h       # => { green: "not_green" }
+h.red        # => nil
+h.blue       # => nil
 ```

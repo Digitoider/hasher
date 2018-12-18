@@ -73,7 +73,6 @@ class Hasher
     end
   end
 
-  # TODO: delete_if { block }
   def delete(key = nil)
     return method_missing(:delete) if key.nil?
 
