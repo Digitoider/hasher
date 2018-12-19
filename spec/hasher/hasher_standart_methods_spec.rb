@@ -3,6 +3,33 @@
 RSpec.describe Hasher do
   subject { Hasher }
 
+  describe '#to_h' do
+    it 'success' do
+      h = subject.new
+
+      h.to_h = :demo
+      expect(h.to_h).to eq(to_h: :demo)
+      expect(h[:to_h]).to eq(:demo)
+      expect(h['to_h']).to eq(:demo)
+    end
+  end
+
+  describe '#dup' do
+    it 'success' do
+      h = subject.new
+
+      h.dup = { duplicated: true }
+      expect(h.to_h).to eq(dup: { duplicated: true })
+      expect(h[:dup]).to eq(duplicated: true)
+      expect(h['dup']).to eq(duplicated: true)
+
+      copy = h.dup
+      copy.dup = { flow: 'exists' }
+      expect(h).to eq(dup: { duplicated: true })
+      expect(copy).to eq(dup: { flow: 'exists' })
+    end
+  end
+
   describe '#dig' do
     it 'success' do
       h = subject.new

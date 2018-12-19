@@ -320,6 +320,21 @@ RSpec.describe Hasher do
     end
   end
 
+  describe '#dup' do
+    it 'success' do
+      h = subject.new(story: { author: 'Missing Guy' })
+
+      copy = h.dup
+      expect(copy).to eq(h)
+
+      copy.story.author = 'Teleporter'
+      expect(h.story.author).to eq('Missing Guy')
+
+      copy.mental_mood = 'is pretty good'
+      expect(h.mental_mood).to eq(nil)
+    end
+  end
+
   context 'indifferent access' do
     it 'symbolic key' do
       h = subject.new
@@ -602,6 +617,13 @@ RSpec.describe Hasher do
   end
 
   describe '#delete' do
+    it 'returns removed value' do
+      h = subject.new
+
+      h.a = 5
+      expect(h.delete('a')).to eq(5)
+    end
+
     context 'composite' do
       it 'key exists' do
         h = subject.new
@@ -678,6 +700,17 @@ RSpec.describe Hasher do
   end
 
   describe '#delete_if' do
+    it 'returns self' do
+      h = subject.new(a: 1, b: 2, c: { d: 'mension' })
+
+      the_same_instance = h.delete_if do |key|
+        subject.indifferentiate_keys(:a, 'b').include?(key)
+      end
+      expect(the_same_instance).to eq(h)
+      h.c.d = 'another'
+      expect(the_same_instance.c.d).to eq('another')
+    end
+
     it 'with values only' do
       h = subject.new
       h.a = { gang: 1 }
@@ -705,8 +738,67 @@ RSpec.describe Hasher do
       hash = { red: :red, green: :green, blue: 'yellow' }
       h = subject.new(hash)
       h.delete_if { |key, value| key.to_s != value.to_s }
-      expect(h.to_h).to eq(red: :red, green: :green,)
+      expect(h.to_h).to eq(red: :red, green: :green)
       expect(h.blue).to eq(nil)
+    end
+  end
+
+  describe '#reject' do
+    it 'returns a copy hasher' do
+      h = subject.new(a: 1, deep: { sea: 'skeleton' }, c: 3)
+
+      result = h.reject { |key| key == :deep }
+      expect(h.to_h).to eq(a: 1, deep: { sea: 'skeleton' }, c: 3)
+      expect(result.to_h).to eq(deep: { sea: 'skeleton' })
+      result.deep.sea = 'not really'
+      expect(h.deep.sea).to eq('skeleton')
+      h.deep.sea = 'avenue'
+      expect(result.deep.sea).to eq('not really')
+    end
+  end
+
+  describe '#keep_if' do
+    it 'returns removed values' do
+      h = subject.new(a: 1, b: 2, c: { d: 'mension' })
+
+      the_same_instance = h.keep_if do |key|
+        subject.indifferentiate_keys(:a, 'c').include?(key)
+      end
+      expect(the_same_instance).to eq(h)
+      h.c.d = 'another'
+      expect(the_same_instance.c.d).to eq('another')
+    end
+
+    it 'with values only' do
+      h = subject.new
+      h.a = { gang: 1 }
+      h.b = { gang: 2 }
+      h.c = { gang: 3 }
+      h.d = { gang: 4 }
+
+      h.keep_if { |_key, value| value.gang > 2 }
+
+      expect(h.to_h).to eq(c: { gang: 3 }, d: { gang: 4 })
+      expect(h.a).to eq(nil)
+      expect(h.b).to eq(nil)
+    end
+
+    it 'with keys only' do
+      hash = { quick: 1, brown: 2, fox: 3, jumps: 4 }
+      h = subject.new(hash)
+      h.keep_if { |key| %w[quick fox].include?(key.to_s) }
+      expect(h.to_h).to eq(quick: 1, fox: 3)
+      expect(h.brown).to eq(nil)
+      expect(h.jumps).to eq(nil)
+    end
+
+    it 'with keys and values' do
+      hash = { red: :red, green: :green, blue: 'yellow' }
+      h = subject.new(hash)
+      h.keep_if { |key, value| key.to_s != value.to_s }
+      expect(h.to_h).to eq(blue: 'yellow')
+      expect(h.red).to eq(nil)
+      expect(h.green).to eq(nil)
     end
   end
 end

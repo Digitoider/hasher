@@ -34,6 +34,24 @@ require 'hasher/kernel/tree_printer'
 require 'pry-byebug'
 
 class Hasher
+  def self.indifferentiate_keys(*keys)
+    indifferentiator = ::Kernel::Dirty::Indifferentiator.new
+    keys.map { |key| indifferentiator.define(key) }
+  end
+
+  def self.indifferentiate_key(key)
+    ::Kernel::Dirty::Indifferentiator.new.define(key)
+  end
+
+  def self.[](*array)
+    result = Hasher.new
+    return result if array == []
+    array.each do |key, value|
+      result[key] = value.dup
+    end
+    result
+  end
+
   def initialize(initial_value = {})
     return if initial_value == {} || !initial_value.is_a?(Hash)
     hasher = ::Kernel::Hasherizer.new.to_hasher(initial_value)
@@ -42,6 +60,10 @@ class Hasher
 
   def to_h
     ::Kernel::Hasherizer.new.to_h(tree.root)
+  end
+
+  def dup
+    Hasher.new(to_h)
   end
 
   def each
@@ -84,6 +106,28 @@ class Hasher
       value = method_missing(key)
       delete(key) if yield(key, value)
     end
+    self
+  end
+
+  def reject
+    return method_missing(:reject) unless block_given?
+
+    rejected = []
+    tree.keys.each do |key|
+      value = method_missing(key)
+      rejected << [key, value] if yield(key, value)
+    end
+    Hasher[*rejected]
+  end
+
+  def keep_if
+    return method_missing(:keep_if) unless block_given?
+
+    tree.keys.each do |key|
+      value = method_missing(key)
+      delete(key) unless yield(key, value)
+    end
+    self
   end
 
   def dig(*keys)

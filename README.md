@@ -119,6 +119,14 @@ person.siblings[0].sister   # => "Lila"
 person.siblings[1].brother  # => "Thomas"
 ```
 
+### Instantiation with `[]`
+
+```ruby
+
+Hasher[]                   # => {}
+Hasher[[:a, 1], ['b', 2]]  # => { a: 1, b: 2 }
+```
+
 ## Helpful methods
 
 ### `to_h`
@@ -156,6 +164,24 @@ h[:to_h]   # => "This is :to_h key"
 h['to_h']  # => "This is :to_h key"
 h.to_h     # => { a: "This is :a key", to_h: "This is :to_h key" }
 ```
+
+### `dup`
+Returns a copy of a `Hasher` instance:
+```ruby
+h = subject.new(story: { author: 'Missing Guy' })
+
+copy = h.dup
+copy == h                           # => true
+
+copy.story.author = 'Teleporter'
+h.story.author                      # => 'Missing Guy'
+
+copy.mental_mood = 'is pretty good'
+h.mental_mood                       # => nil
+```
+_**Important!**_ To access `dup` key on an instance of
+a `Hasher` use `h[:dup]` or `h['dup']`
+
 
 ### `each`
 Allows you to iterate through each `|key|` or `|key, value|` pair:
@@ -315,7 +341,8 @@ h.delete         # => "no"
 ```
 
 ### `delete_if`
-Removes keys with values if a condition in the block returns *true*
+Removes keys with values if a condition in the block returns *true*.
+Returns self
 ```ruby
 h = Hasher.new(red: :red, blue: :blue, green: 'not_green')
 
@@ -325,3 +352,105 @@ h.to_h       # => { green: "not_green" }
 h.red        # => nil
 h.blue       # => nil
 ```
+**Important!** Inside of a `Hasher` instance keys are being transformed
+into their indifferent representations. See what happens when the comparison
+of the keys goes down the road:
+```ruby
+h = Hasher.new(a: 1, b: 2, c: 3)
+
+h.delete_if { |key| key == :a || key == 'b' }
+
+h.to_h       # => { b: 2, c: 3 }
+```
+Using `Hasher.indifferentiate_keys` will solve the case above properly:
+```ruby
+h = subject.new(a: 1, b: 2, c: 3)
+
+removed_values = h.delete_if do |key|
+  subject.indifferentiate_keys(:a, 'b').include?(key)
+end
+
+pp removed_values   # => [1, 2]
+```
+Or simply try converting keys in the block with `.to_s` method.
+
+More info can be found on `Hasher.indifferentiate_keys` section.
+
+### `reject`
+Does the same as `delete_if`, returns a copy of `Hasher` instance,
+which contains removed key value pairs:
+```ruby
+h = Hasher.new(a: 1, deep: { sea: 'skeleton' }, c: 3)
+
+result = h.reject { |key| key == :deep }
+
+h.to_h                          # => { a: 1, deep: { sea: 'skeleton' }, c: 3 }
+result.to_h                     # => { deep: { sea: 'skeleton' } }
+
+result.deep.sea = 'not really'
+h.deep.sea                      # => 'skeleton'
+
+h.deep.sea = 'avenue'
+result.deep.sea                 # => 'not really'
+```
+
+### `keep_if`
+Removes keys with values if a passed block evaluates to *false*.
+Returns self
+```ruby
+h = Hasher.new(red: :red, blue: :blue, green: 'not_green')
+
+h.keep_if { |key, value| key.to_s == value.to_s }
+
+h.to_h       # => { red: :red, blue: :blue }
+h.green      # => nil
+```
+
+
+## Instance methods
+
+### `Hasher.indifferentiate_keys(*keys)`
+Returns an array of keys as they are stored in `Hasher`'s inner structure:
+```ruby
+Hasher.indifferentiate_keys(:a, 'b', :'c', 'd e')
+# => [:a, :b, :c, "d e"]
+
+Hasher.indifferentiate_keys(4.5, 3, '6', '1.8', :'17.4')
+# => ['4.5', '3', '6', '1.8', '17.4']
+
+Hasher.indifferentiate_keys
+# => []
+```
+
+### `Hasher.indifferentiate_key(key)`
+Returns a key as it would be stored in `Hasher`'s inner structure:
+```ruby
+Hasher.indifferentiate_key(:a)  # => :a
+Hasher.indifferentiate_key('a') # => :a
+Hasher.indifferentiate_key(4.5) # => "4.5"
+Hasher.indifferentiate_key('8') # => "8"
+```
+
+
+# Configuration thoughts
+
+When `config.strict_comparison = true`:
+```ruby
+h = Hasher.new(a: 1, b: 2, 36   => 'thirty six')
+
+h == { a:     1, b: 2, 36   => 'thirty six' }   # => true
+h == { 'a' => 1, b: 2, 36   => 'thirty six' }   # => false
+h == { a:     1, b: 2, '36' => 'thirty six' }   # => false
+```
+
+When `config.strict_comparison = false`:
+```ruby
+h = Hasher.new(a: 1, b: 2, 36   => 'thirty six')
+
+h == { a:     1, b: 2, 36   => 'thirty six' }   # => true
+h == { 'a' => 1, b: 2, 36   => 'thirty six' }   # => true
+h == { a:     1, b: 2, '36' => 'thirty six' }   # => true
+```
+Or create method `#compare_signature(other)`
+
+
