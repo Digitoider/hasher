@@ -83,4 +83,31 @@ RSpec.describe Hasher do
       expect(h.to_h).to eq(delete_if: 'assigning')
     end
   end
+
+  describe '#reject' do
+    it 'success' do
+      h = subject.new
+      h.reject = true
+      expect(h.reject).to eq(true)
+      expect(h.to_h).to eq(reject: true)
+    end
+  end
+
+  describe '#keep_if' do
+    it 'success' do
+      h = subject.new
+      h.keep_if = :false
+      expect(h.keep_if).to eq(:false)
+      expect(h.to_h).to eq(keep_if: :false)
+    end
+  end
+
+  describe '#select' do
+    it 'success' do
+      h = subject.new
+      h.select = 'them all'
+      expect(h.select).to eq('them all')
+      expect(h.to_h).to eq(select: 'them all')
+    end
+  end
 end

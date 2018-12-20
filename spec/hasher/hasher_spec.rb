@@ -747,7 +747,7 @@ RSpec.describe Hasher do
     it 'returns a copy hasher' do
       h = subject.new(a: 1, deep: { sea: 'skeleton' }, c: 3)
 
-      result = h.reject { |key| key == :deep }
+      result = h.reject { |key| key != :deep }
       expect(h.to_h).to eq(a: 1, deep: { sea: 'skeleton' }, c: 3)
       expect(result.to_h).to eq(deep: { sea: 'skeleton' })
       result.deep.sea = 'not really'
@@ -799,6 +799,20 @@ RSpec.describe Hasher do
       expect(h.to_h).to eq(blue: 'yellow')
       expect(h.red).to eq(nil)
       expect(h.green).to eq(nil)
+    end
+  end
+
+  describe '#select' do
+    it 'returns a copy hasher' do
+      h = subject.new(a: 1, seismic: { defender: 99 }, c: 3)
+
+      result = h.select { |_key, value| value.is_a?(subject) }
+      expect(h.to_h).to eq(a: 1, seismic: { defender: 99 }, c: 3)
+      expect(result.to_h).to eq(seismic: { defender: 99 })
+      result.seismic.defender = 'aqua rythm'
+      expect(h.seismic.defender).to eq(99)
+      h.seismic.defender = 'exhibition'
+      expect(result.seismic.defender).to eq('aqua rythm')
     end
   end
 end

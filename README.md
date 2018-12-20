@@ -377,12 +377,12 @@ Or simply try converting keys in the block with `.to_s` method.
 More info can be found on `Hasher.indifferentiate_keys` section.
 
 ### `reject`
-Does the same as `delete_if`, returns a copy of `Hasher` instance,
-which contains removed key value pairs:
+Returns a new `Hasher` instance consisting of elements for which the 
+block evaluates to *false*:
 ```ruby
 h = Hasher.new(a: 1, deep: { sea: 'skeleton' }, c: 3)
 
-result = h.reject { |key| key == :deep }
+result = h.reject { |key| key != :deep }
 
 h.to_h                          # => { a: 1, deep: { sea: 'skeleton' }, c: 3 }
 result.to_h                     # => { deep: { sea: 'skeleton' } }
@@ -392,6 +392,24 @@ h.deep.sea                      # => 'skeleton'
 
 h.deep.sea = 'avenue'
 result.deep.sea                 # => 'not really'
+```
+
+### `select`
+Does the opposite of `reject`. Returns a new `Hasher` instance consisting of elements for which the 
+block evaluates to *true*:
+```ruby
+h = Hasher.new(a: 1, seismic: { defender: 99 }, c: 3)
+
+result = h.select { |_key, value| value.is_a?(Hasher) }
+
+h.to_h                                  # => { a: 1, seismic: { defender: 99 }, c: 3
+result.to_h                             # => { seismic: { defender: 99 } }
+result.seismic.defender = 'aqua rythm'
+
+h.seismic.defender                      # => 99
+h.seismic.defender = 'exhibition'
+
+result.seismic.defender                 # => "aqua rythm"
 ```
 
 ### `keep_if`

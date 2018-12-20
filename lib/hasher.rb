@@ -115,7 +115,7 @@ class Hasher
     rejected = []
     tree.keys.each do |key|
       value = method_missing(key)
-      rejected << [key, value] if yield(key, value)
+      rejected << [key, value] unless yield(key, value)
     end
     Hasher[*rejected]
   end
@@ -128,6 +128,17 @@ class Hasher
       delete(key) unless yield(key, value)
     end
     self
+  end
+
+  def select
+    return method_missing(:select) unless block_given?
+
+    selected = []
+    tree.keys.each do |key|
+      value = method_missing(key)
+      selected << [key, value] if yield(key, value)
+    end
+    Hasher[*selected]
   end
 
   def dig(*keys)
