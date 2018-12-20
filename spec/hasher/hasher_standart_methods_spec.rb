@@ -110,4 +110,13 @@ RSpec.describe Hasher do
       expect(h.to_h).to eq(select: 'them all')
     end
   end
+
+  describe '#merge' do
+    it 'success' do
+      h = subject.new
+      h.merge = 'just do it'
+      expect(h.merge).to eq('just do it')
+      expect(h.to_h).to eq(merge: 'just do it')
+    end
+  end
 end

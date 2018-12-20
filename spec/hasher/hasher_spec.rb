@@ -815,4 +815,44 @@ RSpec.describe Hasher do
       expect(result.seismic.defender).to eq('aqua rythm')
     end
   end
+
+  describe '#merge' do
+    context 'with `Hash`' do
+      it 'returns a new merged instance' do
+        h = subject.new(a: 1, b: { system: :rule }, c: 2)
+
+        merged = h.merge(c: :uniq, b: { regex: /shallow/ })
+
+        expect(merged.to_h).to eq(a: 1, c: :uniq, b: { regex: /shallow/ })
+        expect(h.to_h).to eq(a: 1, b: { system: :rule }, c: 2)
+
+        h.a = 2
+        expect(merged.a).to eq(1)
+      end
+    end
+
+    context 'with `Hasher`' do
+      it 'returns a new merged instance' do
+        h1 = subject.new(movies: [1, 2, 3], cast: [{ id: 9, name: 'Steve' }])
+        h2 = subject.new(year: 1984)
+
+        expected = {
+          movies: [1, 2, 3],
+          cast: [{ id: 9, name: 'Steve' }],
+          year: 1984
+        }
+        merged = h1.merge(h2)
+        expect(merged).to eq(expected)
+
+        merged.year += 2
+        expect(merged.year).to eq(1986)
+        merged.movies = [4, 5, 6]
+        expect(merged.movies).to eq([4, 5, 6])
+        expect(h1.movies).to eq([1, 2, 3])
+        expect(h2.movies).to eq(nil)
+        expect(h1.year).to eq(nil)
+        expect(h2.year).to eq(1984)
+      end
+    end
+  end
 end

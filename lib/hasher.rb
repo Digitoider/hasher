@@ -141,6 +141,12 @@ class Hasher
     Hasher[*selected]
   end
 
+  def merge(other = nil)
+    return method_missing(:merge) if other.nil?
+
+    Hasher.new(to_h.merge(other.to_h))
+  end
+
   def dig(*keys)
     return method_missing(:dig) if keys.count.zero?
 

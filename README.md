@@ -377,7 +377,7 @@ Or simply try converting keys in the block with `.to_s` method.
 More info can be found on `Hasher.indifferentiate_keys` section.
 
 ### `reject`
-Returns a new `Hasher` instance consisting of elements for which the 
+Returns a new `Hasher` instance consisting of elements for which the
 block evaluates to *false*:
 ```ruby
 h = Hasher.new(a: 1, deep: { sea: 'skeleton' }, c: 3)
@@ -395,7 +395,7 @@ result.deep.sea                 # => 'not really'
 ```
 
 ### `select`
-Does the opposite of `reject`. Returns a new `Hasher` instance consisting of elements for which the 
+Does the opposite of `reject`. Returns a new `Hasher` instance consisting of elements for which the
 block evaluates to *true*:
 ```ruby
 h = Hasher.new(a: 1, seismic: { defender: 99 }, c: 3)
@@ -424,8 +424,47 @@ h.to_h       # => { red: :red, blue: :blue }
 h.green      # => nil
 ```
 
+### `merge(other)`
+Returns a new instance of `Hasher`. `other` can be either an
+instance of `Hash` or `Hasher`.
+Down below you can see an example of merging with `Hash`:
+```ruby
+h = Hasher.new(a: 1, b: { system: :rule }, c: 2)
 
-## Instance methods
+merged = h.merge(b: { regex: /shallow/ }, c: :the_universe)
+
+merged.to_h # => { a: 1, b: { regex: /shallow/ }, c: :the_universe }
+h.to_h      # => { a: 1, b: { system: :rule }, c: 2 }
+
+h.a = 2
+merged.a    # => 1
+```
+
+Merging with `Hasher`:
+```ruby
+h1 = Hasher.new(movies: [1, 2, 3], cast: [{ id: 9, name: 'Steve' }])
+h2 = Hasher.new(year: 1984)
+
+merged = h1.merge(h2)
+merged
+# =>    {
+#         movies: [1, 2, 3],
+#         cast: [{ id: 9, name: 'Steve' }],
+#         year: 1984
+#       }
+
+merged.year += 2
+merged.year                # => 1986
+h1.year                    # => nil
+h2.year                    # => 1984
+
+merged.movies = [4, 5, 6]
+merged.movies              # => [4, 5, 6]
+h1.movies                  # => [1, 2, 3]
+h2.movies                  # => nil
+```
+
+## Class methods
 
 ### `Hasher.indifferentiate_keys(*keys)`
 Returns an array of keys as they are stored in `Hasher`'s inner structure:
