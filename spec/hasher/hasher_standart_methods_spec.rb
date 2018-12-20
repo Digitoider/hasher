@@ -96,9 +96,9 @@ RSpec.describe Hasher do
   describe '#keep_if' do
     it 'success' do
       h = subject.new
-      h.keep_if = :false
-      expect(h.keep_if).to eq(:false)
-      expect(h.to_h).to eq(keep_if: :false)
+      h.keep_if = :falsen
+      expect(h.keep_if).to eq(:falsen)
+      expect(h.to_h).to eq(keep_if: :falsen)
     end
   end
 

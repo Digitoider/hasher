@@ -147,6 +147,18 @@ class Hasher
     Hasher.new(to_h.merge(other.to_h))
   end
 
+  def merge!(other = nil)
+    return method_missing(:merge!) if other.nil?
+
+    other.dup.to_h.each { |key, value| assoc(key, value) }
+  end
+
+  def assoc(key = nil, value = nil)
+    return method_missing(:assoc) if key.nil?
+
+    method_missing("#{key}=", value)
+  end
+
   def dig(*keys)
     return method_missing(:dig) if keys.count.zero?
 

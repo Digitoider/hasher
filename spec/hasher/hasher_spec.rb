@@ -855,4 +855,61 @@ RSpec.describe Hasher do
       end
     end
   end
+
+  describe '#merge!' do
+    context 'with `Hash`' do
+      it 'success' do
+        h = subject.new(a: 1, b: { hash: 'ff3s', '12' => 'old' })
+
+        other = { c: :uniq, b: { also: 'uniq' }, 12 => 'twelve' }
+
+        h.merge!(other)
+
+        expect(h).to eq(a: 1, c: :uniq, b: { also: 'uniq' }, 12 => 'twelve')
+
+        h.b = :different_value
+        expect(other).to eq(c: :uniq, b: { also: 'uniq' }, 12 => 'twelve')
+      end
+    end
+
+    context 'with `Hasher`' do
+      it 'returns a new merged instance' do
+        h1 = subject.new(a: 1, b: { 41 => 'sense' }, c: 'old', 3.8 => 's')
+        h2 = subject.new(c: 'ci', '3.8' => 'd')
+
+        h1.merge!(h2)
+
+        expect(h1.to_h).to eq(a: 1, b: { 41 => 'sense' }, c: 'ci', 3.8 => 'd')
+        expect(h2.to_h).to eq(c: 'ci', 3.8 => 'd')
+
+        h1.c = { new: true }
+        expect(h2.c).to eq('ci')
+      end
+    end
+  end
+
+  describe '#assoc' do
+    it 'associates key with `nil`' do
+      h = subject.new
+
+      h.assoc('a', nil)
+      expect(h.to_h).to eq(a: nil)
+    end
+
+    it 'associates key with hash' do
+      h = subject.new
+
+      h.assoc('a', no: { problem: { at: :all } })
+      expect(h.to_h).to eq(a: { no: { problem: { at: :all } } })
+      expect(h.a.no.problem.at).to eq(:all)
+    end
+
+    it 'associates key with hasher' do
+      h = subject.new
+
+      h.assoc('a', subject.new(no: { problem: { at: :all } }))
+      expect(h.to_h).to eq(a: { no: { problem: { at: :all } } })
+      expect(h.a.no.problem.at).to eq(:all)
+    end
+  end
 end

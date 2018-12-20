@@ -464,6 +464,54 @@ h1.movies                  # => [1, 2, 3]
 h2.movies                  # => nil
 ```
 
+### `merge!(other)`
+Does the same thing as `merge`, but works on itself. If key does
+not exist, hasher associates a value that matches the key. If key
+already exists, it replaces the value. Works either with `Hash` or
+`Hasher`.
+Merging with `Hash`:
+```ruby
+h = Hasher.new(a: 1, b: { hash: 'ff3s', '12' => 'old' })
+
+other = { c: :uniq, b: { also: 'uniq' }, 12 => 'twelve' }
+
+h.merge!(other)
+h.to_h          # => { a: 1, c: :uniq, b: { also: 'uniq' }, 12 => 'twelve' }
+
+h.b = :another
+other           # => { c: :uniq, b: { also: 'uniq' }, 12 => 'twelve' }
+```
+
+Merging with `Hasher`:
+```ruby
+h1 = Hasher.new(a: 1, b: { 41 => 'sense' }, c: 'old', 3.8 => 's')
+h2 = Hasher.new(c: 'ci', '3.8' => 'd')
+
+h1.merge!(h2)
+
+h1.to_h               # => { a: 1, b: { 41 => 'sense' }, c: 'ci', 3.8 => 'd' }
+h2.to_h               # => { c: 'ci', 3.8 => 'd' }
+
+h1.c = { new: true }
+h2.c                  # => 'ci'
+```
+
+### `assoc(key, value)`
+Associates value with the key. If key is *nil*, retrieves
+value associated with `assoc` key:
+```ruby
+h = Hasher.new
+
+h.assoc('a', no: { problem: { at: :all } })
+h.to_h              # => { a: { no: { problem: { at: :all } } } }
+h.a.no.problem.at   # => :all
+
+h.assoc             # => nil
+h.assoc = 5
+h.assoc             # => 5
+```
+
+
 ## Class methods
 
 ### `Hasher.indifferentiate_keys(*keys)`
